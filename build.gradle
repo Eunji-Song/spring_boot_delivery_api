@@ -16,8 +16,25 @@ repositories {
 }
 
 dependencies {
+
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.projectlombok:lombok'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// logging
+	implementation 'org.slf4j:slf4j-api'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+
+	// model mapper
+	implementation 'org.modelmapper:modelmapper:2.3.6'
+	implementation 'joda-time:joda-time:2.12.5'
+
 }
 
 tasks.named('bootBuildImage') {
