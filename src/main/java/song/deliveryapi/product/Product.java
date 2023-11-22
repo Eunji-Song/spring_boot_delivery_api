@@ -1,22 +1,56 @@
 package song.deliveryapi.product;
 
+import jakarta.persistence.*;
+import lombok.*;
 
+import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.joda.time.LocalDateTime;
+import org.springframework.data.annotation.CreatedBy;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
-
+@Entity
+@DynamicUpdate
+@Getter
+@NoArgsConstructor
+@ToString
+@Builder
 public class Product {
-    private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT를 사용
+    private Long id;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "description")
     private String description;
+
+    @Column(name = "store_id")
     private Integer storeId;
+
+    @Column(name = "cateogry_id")
     private Integer categoryId;
+
+    @Column(name = "price")
     private BigDecimal price;
+
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP", updatable = false)
+    @ColumnDefault("CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", columnDefinition = "TIMESTAMP", updatable = false)
+    @ColumnDefault("CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 
-    public Product(String name, String description, Integer storeId, Integer categoryId, BigDecimal price, LocalDateTime createdAt, LocalDateTime updatedAt) {
+
+    // 기본 생성자
+    public Product(Long id, String name, String description, Integer storeId, Integer categoryId, BigDecimal price, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.storeId = storeId;
@@ -26,72 +60,36 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
-    // Getter, Setter 선언
-
-    public Integer getId() {
+    public Long id() {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
+    public String description() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getStoreId() {
+    public Integer storeId() {
         return storeId;
     }
 
-    public void setStoreId(Integer storeId) {
-        this.storeId = storeId;
-    }
-
-    public Integer getCategoryId() {
+    public Integer categoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public BigDecimal getPrice() {
+    public BigDecimal price() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public LocalDateTime getCreatedAt() {
+    public LocalDateTime createdAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
+    public LocalDateTime updatedAt() {
         return updatedAt;
     }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-
 
 }
