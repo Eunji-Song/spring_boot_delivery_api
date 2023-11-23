@@ -16,20 +16,23 @@ repositories {
 }
 
 dependencies {
-
-
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// 객체의 유효성 검사를 위해 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// DB 연결
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	// logging
 	implementation 'org.slf4j:slf4j-api'
+
+	// lombok
+	implementation 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-
 
 	// model mapper
 	implementation 'org.modelmapper:modelmapper:2.3.6'
