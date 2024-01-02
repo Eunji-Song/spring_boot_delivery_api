@@ -17,9 +17,10 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.jetbrains:annotations:24.0.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	// 객체의 유효성 검사를 위해 의존성 추가
+	// 객체의 유효성 검사(dto)를 위해 의존성 추가
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	// DB 연결
@@ -38,6 +39,17 @@ dependencies {
 	implementation 'org.modelmapper:modelmapper:2.3.6'
 	implementation 'joda-time:joda-time:2.12.5'
 
+	// spring boot security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	// jwt
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
+	// gson
+	implementation 'com.google.code.gson:gson:2.9.0'
 }
 
 tasks.named('bootBuildImage') {
