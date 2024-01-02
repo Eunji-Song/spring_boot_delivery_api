@@ -1,5 +1,8 @@
 package song.deliveryapi.common.exception;
 
+
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
 public class ApplicationException extends RuntimeException {
     private Boolean success;
     private int code;
