@@ -3,6 +3,7 @@ package song.deliveryapi.domain.user;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -49,9 +50,11 @@ public class UserController {
         return tokenResponseDto;
     }
 
+    // 인증 정보 확인
     @GetMapping("/check")
-    public void check(@Valid @RequestBody TokenRequestDto requestDto) {
-        log.info("check");
-        userService.check(requestDto);
+    public void check() {
+
     }
+
+
 }
