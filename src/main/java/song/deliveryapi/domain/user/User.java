@@ -8,16 +8,19 @@ import song.deliveryapi.domain.auth.Authority;
 import java.util.Set;
 
 @Entity
-@Setter
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Setter
+@AllArgsConstructor // 필두로 작성된
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 기본 생성자 생성
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+
+    @Column(name = "name")
+    private String name;
 
     @Email
     @Column(name = "email", unique = true)
@@ -33,14 +36,6 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     private Set<Authority> authorities;
 
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", authorities=" + authorities +
-                '}';
-    }
 }
+
+

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import song.deliveryapi.domain.user.User;
 import song.deliveryapi.domain.user.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,17 +27,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     @Transactional
+    // username(email)을 이용하여 회원 정보 가져오기
     public UserDetails loadUserByUsername(final String email) {
-        Optional<User> user1 = userRepository.findByEmail(email);
-        log.info(user1.toString());
-
         return userRepository.findByEmail(email)
-                .map(user -> createUser(email, user))
+                .map(user -> createUser(user))
                 .orElseThrow(() -> new UsernameNotFoundException(email + " -> 데이터베이스에서 찾을 수 없습니다."));
     }
 
-    private org.springframework.security.core.userdetails.User createUser(String email, User user) {
 
+    private org.springframework.security.core.userdetails.User createUser(User user) {
         List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getAuthorityName()))
                 .collect(Collectors.toList());
