@@ -1,61 +1,65 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.1.5'
-	id 'io.spring.dependency-management' version '1.1.3'
+	id 'org.springframework.boot' version '3.2.1'
+	id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'song'
 version = '0.0.1-SNAPSHOT'
 
-java {
-	sourceCompatibility = '17'
+allprojects {
+	repositories {
+		mavenCentral()
+	}
 }
 
-repositories {
-	mavenCentral()
-}
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
 
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.jetbrains:annotations:24.0.0'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	java {
+		sourceCompatibility = '17'
+	}
 
-	// 객체의 유효성 검사(dto)를 위해 의존성 추가
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	dependencies {
+		implementation 'org.springframework.boot:spring-boot-starter-web'
+		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+		implementation 'org.springframework.boot:spring-boot-starter-security'
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+		testImplementation 'org.springframework.boot:spring-boot-starter-web'
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testImplementation 'org.springframework.security:spring-security-test'
 
-	// DB 연결
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+		// Mariadb connect
+		runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
 
-	// logging
-	implementation 'org.slf4j:slf4j-api'
+		// logging
+		implementation 'org.slf4j:slf4j-api'
 
-	// lombok
-	implementation 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+		// jwt
+		implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+		runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+		runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 
-	// model mapper
-	implementation 'org.modelmapper:modelmapper:2.3.6'
-	implementation 'joda-time:joda-time:2.12.5'
+		// gson
+		implementation 'com.google.code.gson:gson:2.9.0'
+	}
 
-	// spring boot security
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	testImplementation 'org.springframework.security:spring-security-test'
+	configurations {
+		compileOnly {
+			extendsFrom annotationProcessor
+		}
+	}
 
-	// jwt
-	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 
-	// gson
-	implementation 'com.google.code.gson:gson:2.9.0'
+	tasks.named('test') {
+		useJUnitPlatform()
+	}
+
 }
 
 tasks.named('bootBuildImage') {
 	builder = 'paketobuildpacks/builder-jammy-base:latest'
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
 }

@@ -1,1 +1,3 @@
 rootProject.name = 'delivery-api'
+include 'delivery-admin'
+include 'delivery-user'
