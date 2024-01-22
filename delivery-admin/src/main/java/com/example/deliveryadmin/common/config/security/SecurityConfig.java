@@ -55,7 +55,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         requests -> requests
                                 // 로그인과 회원가입 페이지에서는 인증을 사용하지 않음
-                                .requestMatchers( "/admin/members/join", "admin/members/login").permitAll()
+                                .requestMatchers( "/members/join", "/members/login").permitAll()
+                                .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
                                 // 그 외 모든 요청들은 인증 요구
                                 .anyRequest().authenticated()
                 )

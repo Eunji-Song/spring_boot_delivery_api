@@ -60,10 +60,6 @@ public class ApiResponse {
         return new ApiResult<>(resultCode);
     }
 
-    public static ApiResult error(int httpStatusCode, String message) {
-        return new ApiResult<>(httpStatusCode, message);
-    }
-
     /**
      * Resultcode, Data를 매개변수로 받는 메서드
      */

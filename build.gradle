@@ -1,65 +1,81 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.2.1'
-	id 'io.spring.dependency-management' version '1.1.4'
+    id 'java'
+    id 'org.springframework.boot' version '3.2.1'
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'song'
 version = '0.0.1-SNAPSHOT'
 
 allprojects {
-	repositories {
-		mavenCentral()
-	}
+    repositories {
+        mavenCentral()
+    }
 }
 
 subprojects {
-	apply plugin: 'java'
-	apply plugin: 'org.springframework.boot'
-	apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
 
-	java {
-		sourceCompatibility = '17'
-	}
+    java {
+        sourceCompatibility = '17'
+    }
 
-	dependencies {
-		implementation 'org.springframework.boot:spring-boot-starter-web'
-		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-		implementation 'org.springframework.boot:spring-boot-starter-security'
-		compileOnly 'org.projectlombok:lombok'
-		annotationProcessor 'org.projectlombok:lombok'
-		testImplementation 'org.springframework.boot:spring-boot-starter-web'
-		testImplementation 'org.springframework.boot:spring-boot-starter-test'
-		testImplementation 'org.springframework.security:spring-security-test'
+    dependencies {
+        // Mariadb connect
+        runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
 
-		// Mariadb connect
-		runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
 
-		// logging
-		implementation 'org.slf4j:slf4j-api'
+        testImplementation 'org.springframework.boot:spring-boot-starter-web'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.springframework.security:spring-security-test'
 
-		// jwt
-		implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-		runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
-		runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+        // validation
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.2.1'
 
-		// gson
-		implementation 'com.google.code.gson:gson:2.9.0'
-	}
+        // logging
+        implementation 'org.slf4j:slf4j-api'
 
-	configurations {
-		compileOnly {
-			extendsFrom annotationProcessor
-		}
-	}
+        // jwt
+        implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+        runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+        runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
+        // gson
+        implementation 'com.google.code.gson:gson:2.9.0'
+
+        // lombok
+        annotationProcessor 'org.projectlombok:lombok'
+        implementation 'org.projectlombok:lombok:1.18.18'
+        compileOnly 'org.projectlombok:lombok'
+        implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'
+
+        // Mapstruct
+        implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+        annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+        testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.4.2.Final"
+
+        // swagger
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
 
 
-	tasks.named('test') {
-		useJUnitPlatform()
-	}
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
 
 }
 
 tasks.named('bootBuildImage') {
-	builder = 'paketobuildpacks/builder-jammy-base:latest'
+    builder = 'paketobuildpacks/builder-jammy-base:latest'
 }

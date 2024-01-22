@@ -5,37 +5,36 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ResultCode {
-    // Common
-    SUCCESS(200, HttpStatus.OK, "SUCCESS"),
-    ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "ERROR"),
-    INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "Server Error"),
+    /* COMMON - 모든 페이지에서 사용*/
+    SUCCESS(HttpStatus.OK, 200, "SUCCESS"),
+    ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500, "ERROR"),
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, 400, "Bad Request"),
 
-    // Exception
-
-
-    // @Valid
-    INVALID_PARAMETER(400, HttpStatus.BAD_REQUEST, "올바르지 않은 값이 입력되었습니다."),
+    NOT_FOUND(HttpStatus.NOT_FOUND, 404, "데이터를 찾을 수 없습니다."),
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, 405, "Method를 확인해주세요."),
+    INVALID_PARAMETER(HttpStatus.BAD_REQUEST, 400, "올바르지 않은 값이 입력되었습니다."),
+    CONFLICT(HttpStatus.CONFLICT, 409, "충동이 발생하였습니다. "),
 
     // Auth
+    UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, 401, "인증되지 않은 사용자입니다."), // 익명상태
+    EXPIRED_TOKEN(HttpStatus.FORBIDDEN, 403, "유효하지 않은 토큰입니다."), // 토큰 만료 or 유효하지 않은ㅇ 토큰
+    FORBIDDEN(HttpStatus.FORBIDDEN, 403, "실행권한이 없습니다."),
+    INVALID_USER(HttpStatus.NOT_FOUND, 404, "존재하지 않는 사용자 정보입니다."),
 
-    INVALID_TOKEN(403, HttpStatus.FORBIDDEN, "유효하지 않은 토큰입니다."),
-    EXPIRED_TOKEN_TOKEN(403, HttpStatus.FORBIDDEN, "만료된 토큰입니다."),
-    UNAUTHORIZED_USER(403, HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
-    INVALID_USER(404, HttpStatus.NOT_FOUND, "존재하지 않는 사용자 정보 입니다."),
-
-
-    // Controller - user
-    DUPLICATED_USE(408, HttpStatus.CONFLICT, "이미 존재하는 회원의 정보입니다.");
-
+    // Member
+    JOIN_SUCCESS(HttpStatus.OK, 200, "회원가입이 완료되었습니다."),
+    DATA_DUPLICATION_USER(HttpStatus.CONFLICT, 409, "이미 존재하는 회원입니다.");
 
 
-    private final Integer code;
+
+
     private final HttpStatus httpStatus;
+    private final Integer code;
     private final String message;
 
-    ResultCode(Integer code, HttpStatus httpStatus, String message) {
-        this.code = code;
+    ResultCode(HttpStatus httpStatus, Integer code, String message) {
         this.httpStatus = httpStatus;
+        this.code = code;
         this.message = message;
     }
 }
