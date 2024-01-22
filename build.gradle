@@ -11,6 +11,14 @@ allprojects {
 	repositories {
 		mavenCentral()
 	}
+
+//	compileJava {
+//		options.compilerArgs = [
+//				'-amapstruct.defaultcomponentmodel=spring'
+//		]
+//	}
+
+
 }
 
 subprojects {
@@ -23,17 +31,20 @@ subprojects {
 	}
 
 	dependencies {
+		// Mariadb connect
+		runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 		implementation 'org.springframework.boot:spring-boot-starter-security'
-		compileOnly 'org.projectlombok:lombok'
-		annotationProcessor 'org.projectlombok:lombok'
+
 		testImplementation 'org.springframework.boot:spring-boot-starter-web'
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testImplementation 'org.springframework.security:spring-security-test'
 
-		// Mariadb connect
-		runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+		// validation
+		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.2.1'
+
 
 		// logging
 		implementation 'org.slf4j:slf4j-api'
@@ -45,6 +56,25 @@ subprojects {
 
 		// gson
 		implementation 'com.google.code.gson:gson:2.9.0'
+
+
+
+
+		// lombok
+		annotationProcessor 'org.projectlombok:lombok'
+		implementation 'org.projectlombok:lombok:1.18.18'
+		compileOnly 'org.projectlombok:lombok'
+		implementation group: 'org.projectlombok', name: 'lombok-mapstruct-binding', version: '0.2.0'
+
+
+		// Mapstruct
+		implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+		annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+		testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.4.2.Final"
+
+		// swagger
+		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
 	}
 
 	configurations {
