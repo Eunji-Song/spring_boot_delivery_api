@@ -18,7 +18,6 @@ import java.util.Objects;
 
 @Getter
 @Embeddable
-@ToString
 public class Address {
     // 시, 도
     @Column(name = "city")
@@ -38,15 +37,4 @@ public class Address {
 
     @Column(name = "zip_code")
     private String zipCode;
-
-    public boolean isNotEmpty() {
-        return
-            city != null && !city.trim().isEmpty()
-            && district != null && !district.trim().isEmpty()
-            && street != null && !street.trim().isEmpty()
-            && detail != null && !detail.trim().isEmpty()
-            && zipCode != null && !zipCode.trim().isEmpty();
-    }
-
-
 }
