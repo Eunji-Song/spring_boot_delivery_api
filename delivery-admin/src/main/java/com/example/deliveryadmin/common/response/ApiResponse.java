@@ -36,6 +36,10 @@ public class ApiResponse {
         return new ApiResult<>(resultCode, data);
     }
 
+    public static <T> ApiResult<T> success(T data) {
+        return new ApiResult<>(ResultCode.SUCCESS, data);
+    }
+
     /**
      * 성공 리턴시 메시지 내용을 커스텀으로 작성
      */
