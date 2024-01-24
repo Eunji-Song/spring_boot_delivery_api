@@ -8,5 +8,5 @@ public interface MemberMapper {
     MemberMapper INSTANCE = Mappers.getMapper(MemberMapper.class);
 
 
-    Member joinDtoToEntity(MemberRequestDto.Join joinDto);
+    Member joinDtoToMember(MemberDto.RequestJoinDto requestJoinDto);
 }

@@ -20,21 +20,16 @@ import java.util.Objects;
 @Embeddable
 public class Address {
     // 시, 도
-    @Column(name = "city")
     private String city;
 
     // 구, 군
-    @Column(name = "district")
     private String district;
 
     // 동, 읍, 면 & 도로명 + 건물번호
-    @Column(name = "street")
     private String street;
 
     // 상세 주소 (동,층,호)
-    @Column(name = "address_detail")
     private String detail;
 
-    @Column(name = "zip_code")
     private String zipCode;
 }

@@ -1,14 +1,16 @@
-package com.example.deliveryadmin.domain.member;
+package com.example.deliveryadmin.domain.member.service;
 
 import com.example.deliveryadmin.common.config.jwt.TokenProvider;
 import com.example.deliveryadmin.common.exception.member.MemberConflictException;
-import com.example.deliveryadmin.common.response.ResultCode;
-import com.example.deliveryadmin.domain.member.MemberRequestDto;
+import com.example.deliveryadmin.common.exception.member.MemberNotFoundException;
+import com.example.deliveryadmin.common.util.SecurityUtil;
 import com.example.deliveryadmin.domain.member.Member;
 import com.example.deliveryadmin.domain.member.MemberMapper;
-import com.example.deliveryadmin.domain.member.MemberRepository;
+import com.example.deliveryadmin.domain.member.MemberDto;
+import com.example.deliveryadmin.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -17,7 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,44 +37,45 @@ public class MemberService {
      * 회원가입
      */
     @Transactional
-    public Long join(MemberRequestDto.Join joinDto) {
-        log.info("회원가입 요청 : {}", joinDto);
+    public Long join(MemberDto.RequestJoinDto requestJoinDto) {
+        log.info("[Member:join] 회원가입 요청 발생 : {}", requestJoinDto);
+
         // 계정 ID 중복 검사
-        boolean isDuplicatedId = isDuplicatedMemberId(joinDto.getAccountId());
-        if (isDuplicatedId) {
-            throw new MemberConflictException(ResultCode.DATA_DUPLICATION_USER);
-        }
+        isExistAccount(requestJoinDto.getAccountId());
 
         // 비밀번호 암호화
-        String encodePassword = passwordEncoder.encode(joinDto.getPassword());
-        joinDto.setPassword(encodePassword);
+        String encodePassword = passwordEncoder.encode(requestJoinDto.getPassword());
+        requestJoinDto.setPassword(encodePassword);
 
         // DTO -> Entity
-        Member member = memberMapper.joinDtoToEntity(joinDto);
+        Member member = memberMapper.joinDtoToMember(requestJoinDto);
         memberRepository.save(member);
 
         return member.getId();
     }
 
     /**
-     * 계정 ID 중복 검사
+     * 회원가입 - ID 중복 검사
      */
-    private boolean isDuplicatedMemberId(String accountId) {
-        Optional<Member> member = memberRepository.findOneByAccountId(accountId);
-        if (member.isPresent()) {
-            return true;
+    private void isExistAccount(String accountId) {
+        log.info("[Member:isExistAccount] 데이터 중복 조회 : {}", accountId);
+        boolean isDuplicatedId = memberRepository.existsByAccountId(accountId);
+        if (isDuplicatedId) {
+            log.info("www");
+            throw new MemberConflictException(accountId);
         }
-        return false;
     }
+
 
     /**
      * 로그인
      */
     @Transactional
-    public MemberResponseDto.Login login(MemberRequestDto.Login loginDto) {
+    public MemberDto.Login login(MemberDto.RequestLoginDto requestLoginDto) {
+        log.info("[Member:join] 로그인 요청 발생 : {}", requestLoginDto);
         // 입력한 값을 기준으로 인증 후 토큰 생성
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDto.getAccountId(), loginDto.getPassword());
+                new UsernamePasswordAuthenticationToken(requestLoginDto.getAccountId(), requestLoginDto.getPassword());
 
         // 인증 수행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -84,12 +88,31 @@ public class MemberService {
         String refreshToken = tokenProvider.createRefreshToken(authentication);
         log.info("refreshToken : {}", refreshToken);
 
-        // Token data DB에 저장
 
 
         // DTO에 데이터 추가 후 리턴
-        MemberResponseDto.Login login = MemberResponseDto.Login.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+        MemberDto.Login login = MemberDto.Login
+                                    .builder()
+                                    .accessToken(accessToken)
+                                    .refreshToken(refreshToken)
+                                    .build();
 
         return login;
     }
+
+    /**
+     * 회원탈퇴
+     * Token값으로 처리
+     */
+    @Transactional
+    public void withdrawal() {
+        log.info("[Member:withdrawal] 회원 탈퇴 요청");
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        log.info("member id : {}", memberId);
+
+        // 회원 존재 여부 검사
+        memberRepository.withdrawal(memberId);
+    }
+
+
 }
