@@ -2,12 +2,8 @@ package com.example.deliveryadmin.common.exception;
 
 import com.example.deliveryadmin.common.response.ApiResult;
 import com.example.deliveryadmin.common.response.ResultCode;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,15 +15,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.HashMap;
-import java.util.IllegalFormatException;
-import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -44,6 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     protected ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
         log.info("handleRuntimeException : {}", ex.getMessage());
+
         ApiResult apiResult = new ApiResult(ResultCode.BAD_REQUEST, ex.getMessage());
         return ResponseEntity.status(HttpStatus.OK).body(apiResult);
     }
@@ -62,6 +55,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error("MethodArgumentNotValidException caught: {}", ex.getMessage());
 
+
         ApiResult apiResult = new ApiResult(ResultCode.METHOD_NOT_ALLOWED, ex.getMessage());
         return new ResponseEntity<>(apiResult, headers, HttpStatus.OK);
     }
@@ -71,7 +65,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error("handleTypeMismatch caught: {}", ex.getMessage());
 
-        ApiResult apiResult = new ApiResult(ResultCode.BAD_REQUEST, ex.getMessage());
+        ApiResult apiResult = new ApiResult(ResultCode.BAD_REQUEST, "파라미터 값을 확인해주세요.");
         return new ResponseEntity<>(apiResult, headers, HttpStatus.OK);
     }
 
@@ -93,12 +87,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.OK).body(apiResult);
     }
 
+
     // 409
     @ExceptionHandler(ConflictException.class)
     protected ResponseEntity<Object> handleConflictException(ConflictException ex) {
         log.error("handleConflictException error : {}", ex.getMessage());
 
-        ApiResult apiResult = new ApiResult(ex.getResultCode(), ex.getResultCode().getMessage());
+        ApiResult apiResult = new ApiResult(ResultCode.CONFLICT, ex.getMessage());
         return ResponseEntity.status(HttpStatus.OK).body(apiResult);
     }
 
@@ -124,6 +119,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ApiResult apiResult = new ApiResult(ResultCode.BAD_REQUEST, ex.getMessage());
         return ResponseEntity.status(HttpStatus.OK).body(apiResult);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleException(Exception ex) {
+        log.error("handleException : {}", ex.getMessage());
+
+        ApiResult apiResult = new ApiResult(ResultCode.BAD_REQUEST, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.OK).body(apiResult);
+    }
+
 
 
 }

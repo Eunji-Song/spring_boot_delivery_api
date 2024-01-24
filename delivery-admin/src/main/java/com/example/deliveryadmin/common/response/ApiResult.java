@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 public class ApiResult<T> {
     private final Integer code; // ResultCode.code
     private final String message; // ResultCode.message or custom message
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private final T data; // return data
 
     public ApiResult(ResultCode resultCode) {

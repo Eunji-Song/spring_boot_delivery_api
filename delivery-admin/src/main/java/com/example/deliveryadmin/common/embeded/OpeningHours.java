@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 @Embeddable
 @Getter
@@ -24,8 +25,4 @@ public class OpeningHours {
 
     @Column(name = "break_end_time")
     private LocalTime breakEndTime;
-
-    public boolean isBusinessHoursSet() {
-        return openTime != null && closeTime != null;
-    }
 }

@@ -6,13 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 
-@Getter
 @ResponseStatus(value = HttpStatus.CONFLICT)
-public class ConflictException extends RuntimeException{
-    private final ResultCode resultCode;
-
-
-    public ConflictException(ResultCode resultCode) {
-        this.resultCode = resultCode;
+public class ConflictException extends RuntimeException {
+    public ConflictException(String message) {
+        super(message);
     }
 }

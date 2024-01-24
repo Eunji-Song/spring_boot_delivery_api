@@ -1,5 +1,9 @@
 package com.example.deliveryadmin.common.enums;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 public enum StoreStatus {
     OPERATING("운영중"),
     ON_VACATION("휴업"),
