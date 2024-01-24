@@ -3,8 +3,6 @@ package com.example.deliveryadmin.common.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
 public enum StoreCategory {
     RESTAURANT("Restaurant"),
     CAFE("Cafe"),
@@ -12,5 +10,9 @@ public enum StoreCategory {
     FAST_FOOD("Fast Food"),
     OTHER("Other");
 
-    private final String displayName;
+    private final String storeCategory;
+
+    StoreCategory(String storeCategory) {
+        this.storeCategory = storeCategory;
+    }
 }
