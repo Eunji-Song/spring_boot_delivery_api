@@ -2,6 +2,7 @@ package com.example.deliveryadmin.domain.store;
 
 import com.example.deliveryadmin.common.embeded.Address;
 import com.example.deliveryadmin.common.embeded.OpeningHours;
+import com.example.deliveryadmin.common.entity.BaseEntity;
 import com.example.deliveryadmin.common.enums.StoreCategory;
 import com.example.deliveryadmin.common.enums.StoreStatus;
 import com.example.deliveryadmin.domain.member.Member;
@@ -15,7 +16,7 @@ import org.hibernate.annotations.SQLDelete;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = "member")
-public class Store {
+public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "store_id")
