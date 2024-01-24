@@ -4,14 +4,17 @@ import com.example.deliveryadmin.common.embeded.Address;
 import com.example.deliveryadmin.common.embeded.OpeningHours;
 import com.example.deliveryadmin.common.enums.StoreCategory;
 import com.example.deliveryadmin.common.enums.StoreStatus;
+import com.example.deliveryadmin.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Table(name = "store")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(exclude = "member")
 public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,14 +22,24 @@ public class Store {
     private Long id;
 
     // 소유주
-    @Column(name = "admin_id", nullable = false)
-    private Long adminId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id", nullable = false, updatable = false)
+    private Member member;
 
-    @Column(name = "name", nullable = false)
+    @Column(nullable = false)
     private String name;
 
-    @Column(name = "description")
+    @Lob
     private String description;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    @ColumnDefault("'OPERATING'")
+    private StoreStatus status = StoreStatus.OPERATING;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private StoreCategory category;
 
     @Embedded
     private Address address;
@@ -34,23 +47,25 @@ public class Store {
     @Embedded
     private OpeningHours openingHours;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private StoreStatus status = StoreStatus.OPERATING;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "category", nullable = false)
-    private StoreCategory category;
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean isDel = true;
 
-    @Builder
-    public Store(Long id, Long adminId, String name, String description, Address address, OpeningHours openingHours, StoreStatus status, StoreCategory category) {
+    @Builder(toBuilder = true)
+    public Store(Long id, Member member, String name, String description, StoreStatus status, StoreCategory category, Address address, OpeningHours openingHours, boolean isDel) {
         this.id = id;
-        this.adminId = adminId;
+        this.member = member;
         this.name = name;
         this.description = description;
-        this.address = address;
-        this.openingHours = openingHours;
         this.status = status;
         this.category = category;
+        this.address = address;
+        this.openingHours = openingHours;
+        this.isDel = isDel;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
     }
 }
