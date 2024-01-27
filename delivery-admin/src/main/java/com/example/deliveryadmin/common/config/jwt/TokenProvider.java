@@ -1,34 +1,23 @@
 package com.example.deliveryadmin.common.config.jwt;
 
-import com.example.deliveryadmin.common.exception.ApplicationException;
-import com.example.deliveryadmin.common.response.ResultCode;
-import com.example.deliveryadmin.domain.member.CustomMemberDetailsService;
+import com.example.deliveryadmin.common.exception.NotFoundException;
+import com.example.deliveryadmin.domain.auth.service.AuthDetailService;
 import com.example.deliveryadmin.domain.member.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.util.StringUtils;
 
 import java.security.Key;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 /**
  * JWT 발급 및 검증
@@ -42,17 +31,21 @@ public class TokenProvider implements InitializingBean {
     // Token 만료 기간
     private final Long accessTokenExpirationPeriodMs;
     private final Long refreshTokenExpirationPeriodMs;
-    private final CustomMemberDetailsService customMemberDetailsService;
+//    private final CustomMemberDetailsService customMemberDetailsService;
+    private final AuthDetailService authDetailService;
+
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+
 
 
     public TokenProvider(@Value("${jwt.secret-key}") String secretKey
                         , @Value("${jwt.access-token-expiration-period-ms}") Long tokenValidityInMs
                         , @Value("${jwt.refresh-token-expiration-period-ms}") Long refreshTokenValidInMs
-    , CustomMemberDetailsService customMemberDetailsService) {
+    , AuthDetailService authDetailService) {
         this.secretKey = secretKey;
         this.accessTokenExpirationPeriodMs = tokenValidityInMs;
         this.refreshTokenExpirationPeriodMs = refreshTokenValidInMs;
-        this.customMemberDetailsService = customMemberDetailsService;
+        this.authDetailService = authDetailService;
     }
 
     // 빈이 생성이 되고 의존성 주입 받은 secretKey 값을 Decode해서 key변수에 할당
@@ -106,16 +99,27 @@ public class TokenProvider implements InitializingBean {
      */
     public Authentication getAuthentication(String token) {
         log.info("getAuthentication");
-        Claims claims = Jwts
-                .parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            Claims claims = Jwts
+                    .parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
 
+            UserDetails userDetails = authDetailService.loadUserByUsername(claims.getSubject());
+            Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, token, null);
 
-        UserDetails userDetails = customMemberDetailsService.loadUserByUsername(claims.getSubject());
-        return new UsernamePasswordAuthenticationToken(userDetails, token, null);
+            if (auth == null) {
+                log.info("auth null");
+            }
+            return  auth;
+
+        }catch (Exception e) {
+            log.info("exception message: {}", e.getMessage());
+            throw new NotFoundException("!");
+        }
+
     }
 
     /**
@@ -126,6 +130,7 @@ public class TokenProvider implements InitializingBean {
         try {
             log.info("token : {}", token);
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            log.info("validate token result : true");
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
@@ -137,6 +142,20 @@ public class TokenProvider implements InitializingBean {
             log.info("JWT 토큰이 잘못되었습니다.");
         }
         return false;
+    }
+
+    // Request Header 에서 토큰 정보를 꺼내오기 위한 메소드
+    public String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+
+        String accessToken = request.getHeader("Access-token");
+        String refreshToken = request.getHeader("Refresh-token");
+
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+
+        return null;
     }
 
 

@@ -1,9 +1,6 @@
 package com.example.deliveryadmin.common.config.security;
 
-import com.example.deliveryadmin.common.config.jwt.JwtAuthenticationEntryPoint;
-import com.example.deliveryadmin.common.config.jwt.JwtCustomAccessDeniedHandler;
-import com.example.deliveryadmin.common.config.jwt.JwtSecurityConfig;
-import com.example.deliveryadmin.common.config.jwt.TokenProvider;
+import com.example.deliveryadmin.common.config.jwt.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -24,15 +21,10 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
     private final TokenProvider tokenProvider; // JWT 발급 및 검증
     private final CorsFilter corsFilter;
-    private final JwtCustomAccessDeniedHandler jwtCustomAccessDeniedHandler;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-
-    public SecurityConfig(CorsFilter corsFilter, JwtCustomAccessDeniedHandler jwtCustomAccessDeniedHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, TokenProvider tokenProvider) {
-        this.corsFilter = corsFilter;
-        this.jwtCustomAccessDeniedHandler = jwtCustomAccessDeniedHandler;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+    public SecurityConfig(TokenProvider tokenProvider, CorsFilter corsFilter) {
         this.tokenProvider = tokenProvider;
+        this.corsFilter = corsFilter;
     }
 
     /**
@@ -42,6 +34,7 @@ public class SecurityConfig {
      */
     @Bean // 스프링 컨테이너에 클래스를 등록
     public SecurityFilterChain filterChain(HttpSecurity security) throws Exception {
+
         security
                 // UI기반의 인증차앙이 뜨는것을 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -49,29 +42,33 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 // csrf 보안이 필요없으므로 비활성화 처리
                 .csrf(AbstractHttpConfigurer::disable)
-                // CORS Err 방지, cors 필터가 springSecurityFilter보다 먼저 실행
-                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                // 세션을 사용하지 않기 때문에 STATELESS로 설정
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))// Filter에서 발생한 예외 핸들링
+                .exceptionHandling(
+                        exception -> exception
+                                // 접근 가능 권한 확인 후 접근 불가능한 요청을 했을 때 동작
+                                .accessDeniedHandler(new JwtCustomAccessDeniedHandler())
+                                // 인증되지 않은 유저가 요청했을 때
+                                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                )
                 // 인증 사용하는 페이지 설정
                 .authorizeHttpRequests(
                         requests -> requests
                                 // 로그인과 회원가입 페이지에서는 인증을 사용하지 않음
-                                .requestMatchers( "/members/join", "/members/login").permitAll()
+                                .requestMatchers( "/members/join", "/members/login", "/auth/**").permitAll()
                                 .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
                                 // 그 외 모든 요청들은 인증 요구
                                 .anyRequest().authenticated()
                 )
-                // 세션을 사용하지 않기 때문에 STATELESS로 설정
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Filter에서 발생한 예외 핸들링
-                .exceptionHandling(
-                        exception -> exception
-                                // 접근 가능 권한 확인 후 접근 불가능한 요청을 했을 때 동작
-                                .accessDeniedHandler(jwtCustomAccessDeniedHandler)
-                                // 인증되지 않은 유저가 요청했을 때
-                                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                )
+
+                // CORS Err 방지, cors 필터가 springSecurityFilter보다 먼저 실행
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .with(new JwtSecurityConfig(tokenProvider), customizer -> {});
+
 
         return security.build();
     }
+
+
 }
