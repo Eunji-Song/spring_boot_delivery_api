@@ -6,6 +6,7 @@ import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.springframework.web.bind.annotation.PutMapping;
 
 public class MemberDto {
     // === Request(역직렬화) === //
@@ -102,5 +103,7 @@ public class MemberDto {
             this.name = member.getName();
             this.email = member.getEmail();
         }
+
     }
+
 }
