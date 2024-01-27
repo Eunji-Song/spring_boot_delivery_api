@@ -1,5 +1,7 @@
 package com.example.deliveryadmin.common.exception;
 
+import com.example.deliveryadmin.common.exception.auth.InvalidTokenException;
+import com.example.deliveryadmin.common.exception.member.MemberNotFoundException;
 import com.example.deliveryadmin.common.response.ApiResult;
 import com.example.deliveryadmin.common.response.ResultCode;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.List;
 
 
 @Slf4j
@@ -33,7 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiResult, headers, HttpStatus.OK);
     }
 
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler({RuntimeException.class, InvalidTokenException.class})
     protected ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
         log.info("handleRuntimeException : {}", ex.getMessage());
 
@@ -53,10 +58,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     // @Valid 오류
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        log.error("MethodArgumentNotValidException caught: {}", ex.getMessage());
+        log.error("handleMethodArgumentNotValid caught: {}", ex.getMessage());
 
+        // 오류 내용 추출
+        String targetField = ex.getFieldError().getField();
+        String errMsg = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
 
-        ApiResult apiResult = new ApiResult(ResultCode.METHOD_NOT_ALLOWED, ex.getMessage());
+        // return
+        ApiResult apiResult = new ApiResult(ResultCode.METHOD_NOT_ALLOWED, errMsg);
         return new ResponseEntity<>(apiResult, headers, HttpStatus.OK);
     }
 
@@ -70,11 +79,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
      // 403
-    @ExceptionHandler(AuthenticationException.class)
+    @ExceptionHandler({AuthenticationException.class})
     protected ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
         log.error("Authentication error: {}", ex.getMessage());
 
-        ApiResult apiResult = new ApiResult(ResultCode.UNAUTHORIZED_USER, ex.getMessage());
+        ApiResult apiResult = new ApiResult(ResultCode.UNAUTHORIZED_USER, "존재하지 않는 사용자의 정보가 입력되었습니다.");
         return ResponseEntity.status(HttpStatus.OK).body(apiResult);
     }
 
