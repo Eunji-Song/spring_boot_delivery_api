@@ -10,10 +10,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Tag(name = "Store - 매장 관리")
 @RestController
@@ -30,9 +34,11 @@ public class StoreController {
      * limit : 30
      */
     @GetMapping("")
-    public ApiResult getAllStores(StoreDto.RequestSearchDto requestSearchDto) {
-        return ApiResponse.success(storeService.getAllStores(requestSearchDto));
+    public ApiResult getAllStores(StoreDto.RequestSearchDto requestSearchDto, Pageable pageable) {
+        storeService.getAllStores(requestSearchDto, pageable);
+        return ApiResponse.success();
     }
+
 
 
     /**
@@ -51,9 +57,10 @@ public class StoreController {
     @Operation(description = "가게 신규 등록")
     public ApiResult<Object> save(@RequestPart(name = "request") @Valid StoreDto.RequestSaveDto requestSaveDto
                                 , @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail
+                                , @RequestPart(name = "detailImages", required = false) MultipartFile[] detailImages
                                 , Authentication authentication) {
 
-        Long storeId = storeService.save(requestSaveDto, thumbnail);
+        Long storeId = storeService.save(requestSaveDto, thumbnail, detailImages);
 
         return ApiResponse.success(ResultCode.SUCCESS, storeId);
     }

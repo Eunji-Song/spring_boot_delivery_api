@@ -2,24 +2,26 @@ package com.example.deliveryadmin.domain.store;
 
 import com.example.deliveryadmin.common.embeded.Address;
 import com.example.deliveryadmin.common.embeded.OpeningHours;
-import com.example.deliveryadmin.common.exception.ApplicationException;
 import com.example.deliveryadmin.common.exception.ConflictException;
 import com.example.deliveryadmin.common.exception.fileupload.FileUploadException;
 import com.example.deliveryadmin.common.exception.store.StoreNotFoundException;
 import com.example.deliveryadmin.common.fileupload.*;
-import com.example.deliveryadmin.common.fileupload.AttachmentFileDto;
-import com.example.deliveryadmin.common.fileupload.repository.AttachmentFileRepository;
-import com.example.deliveryadmin.common.response.ResultCode;
+import com.example.deliveryadmin.common.fileupload.dto.AttachmentFileDto;
+import com.example.deliveryadmin.common.fileupload.entity.AttachmentFile;
+import com.example.deliveryadmin.common.fileupload.entity.StoreAttachmentFile;
 import com.example.deliveryadmin.common.util.SecurityUtil;
 import com.example.deliveryadmin.domain.member.Member;
-import com.example.deliveryadmin.domain.member.repository.MemberRepository;
 import com.example.deliveryadmin.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,19 +31,17 @@ import java.util.List;
 public class StoreService {
     private final StoreMapper storeMapper;
     private final StoreRepository storeRepository;
-    private final MemberRepository memberRepository;
     private final AttachmentFileService attachmentFileService;
-    private final AttachmentFileMapper attachmentFileMapper;
-    private final AttachmentFileRepository attachmentFileRepository;
+    private final FileUpload fileUpload;
+
 
     /**
      * 매장 목록 전체 조회
      * 필터링 항목 : 카테고리, 상태
      */
-    public List<StoreDto.DetailInfo> getAllStores(StoreDto.RequestSearchDto requestSearchDto) {
-        log.info("[Store]");
-        List<StoreDto.DetailInfo> storeList = storeRepository.findAllStore(requestSearchDto);
-        return storeList;
+    public void getAllStores(StoreDto.RequestSearchDto requestSearchDto, Pageable pageable) {
+
+//        return Page<StoreDto.ListViewData>;
     }
 
     /**
@@ -53,6 +53,7 @@ public class StoreService {
         if (detailInfo == null) {
             throw new StoreNotFoundException(storeId);
         }
+
 
         return detailInfo;
     }
@@ -107,12 +108,14 @@ public class StoreService {
      * - address, openingHours : null 허용하지 않음
      */
     @Transactional
-    public Long save(StoreDto.RequestSaveDto requestSaveDto, MultipartFile thumbnail) {
+    public Long save(StoreDto.RequestSaveDto requestSaveDto, MultipartFile thumbnail, MultipartFile[] detailImages) {
+        log.info("[StoreService:save] 매장 정보 저장 요청 dto : {} ", requestSaveDto.toString());
+
         // == 사용자 정보 할당 == //
         Member member = SecurityUtil.getCurrentMemberInfo();
         requestSaveDto.setMember(member);
 
-        //  ==== 매장 정보 유효성 검사 및  등록 ==== //
+        // ==== 매장 정보 유효성 검사 및  등록 ==== //
 
         // 매장명 중복 불가 : 관리자 id, 매장명
         validateSaveDtoInputs(requestSaveDto);
@@ -122,22 +125,60 @@ public class StoreService {
         storeRepository.save(store);//
 
         //  ==== 썸네일 등록 ==== //
-        AttachmentFileDto uploadDto = null;
+
+        // 외부로 데이터를 노출하지 않고 내부에서만 처리하기 때문에 엔티티로 선언
+        AttachmentFile attachmentFile = null;
+
+        // 썸네일은 한번에 한장만 업로드 가능
         if (thumbnail != null && thumbnail.getSize() > 0) {
             try {
-                log.error("[StoreService:save] 파일 업로드 시작 ");
+                log.info("[StoreService:save] 썸네일 파일 업로드 시작 ");
 
-                uploadDto = attachmentFileService.saveFile(thumbnail);
-                uploadDto.setStore(store);
+                // 파일 업로드 후 ID값 리턴
+                attachmentFile = fileUpload.uploadFile(thumbnail);
+                attachmentFileService.saveInfo(attachmentFile);
 
-                log.error("[StoreService:save] 파일 DTO mapping, save");
-                AttachmentFile entity = attachmentFileMapper.dtoToEntity(uploadDto);
-                attachmentFileRepository.save(entity);
+
+                // store_attachment_file 데이터 생성
+                StoreAttachmentFile storeAttachmentFile = StoreAttachmentFile.builder()
+                                                            .store(store)
+                                                            .attachmentFile(attachmentFile)
+                                                            .isThumbnail(true)
+                                                            .isDetailImage(false)
+                                                            .build();
+                attachmentFileService.saveStoreAttachmentFileInfo(storeAttachmentFile);
+
             } catch (Exception e) {
                 log.error("file upload error : {}", e.getMessage());
-                throw new FileUploadException("파일 업로드에 실패하였습니다. == 플로우 종료");
+                throw new FileUploadException("썸네일 파일 업로드에 실패하였습니다. == 플로우 종료 == ");
             }
         }
+
+
+        // 상세 이미지 등록
+        if (detailImages.length > 0) {
+            try {
+                log.info("[StoreService:save] 상세 이미지 파일 업로드 시작 ");
+
+                for (MultipartFile detailImage : detailImages) {
+                    AttachmentFile detailAttachment = fileUpload.uploadFile(detailImage);
+                    StoreAttachmentFile detailStoreAttachment = StoreAttachmentFile.builder()
+                            .store(store)
+                            .attachmentFile(detailAttachment)
+                            .isThumbnail(false)
+                            .isDetailImage(true)
+                            .build();
+                    attachmentFileService.saveStoreAttachmentFileInfo(detailStoreAttachment);
+                }
+
+
+            } catch (Exception e) {
+                log.error("file upload error : {}", e.getMessage());
+                throw new FileUploadException("상세 이미지 파일 업로드에 실패하였습니다. == 플로우 종료 == ");
+            }
+        }
+
+
 
         return store.getId();
     }
@@ -179,15 +220,15 @@ public class StoreService {
                 log.info("[StoreService:update] 썸네일 업로드");
 
                 // 파일 업로드
-                uploadDto = attachmentFileService.saveFile(thumbnail);
+//                uploadDto = attachmentFileService.saveFile(thumbnail);
 
                 // 업로드한 파일 데이터 DB에 저장 후 id 값 리턴
-                Long attachmentFileId = attachmentFileService.saveStoreAttachmentFileInfo(uploadDto, store);
-
-                if (store.getThumbnails() != null) {
-                    log.info("[StoreService:update] 기존 썸네일 삭제 처리");
-                    attachmentFileService.deleteFileInfo(store.getThumbnails().get(0).getId());
-                }
+//                Long attachmentFileId = attachmentFileService.saveStoreAttachmentFileInfo(uploadDto, store);
+//
+//                if (store.getThumbnails() != null) {
+//                    log.info("[StoreService:update] 기존 썸네일 삭제 처리");
+//                    attachmentFileService.deleteFileInfo(store.getThumbnails().get(0).getId());
+//                }
             } catch (Exception e) {
                 throw new FileUploadException("파일 업로드에 실패하였습니다. == 플로우 종료");
             }
@@ -201,10 +242,30 @@ public class StoreService {
     @Transactional
     public void delete(Long storeId) {
         // 삭제 대상 데이터 존재 여부 확인
-        boolean isExistStore = storeRepository.existsById(storeId);
+        boolean isExistStore = storeRepository.isExists(storeId);
         if (isExistStore == false) {
             throw new StoreNotFoundException(storeId);
         }
+
+
+
+        // store_id가 특정 값인 storeAttachmentFile 조회
+        List<StoreAttachmentFile> storeAttachmentFiles = attachmentFileService.findChildImagesByStoreId(storeId);
+
+        // 조회된 storeAttachmentFile에 연결된 AttachmentFile을 가져와서 is_del을 true로 업데이트
+        for (StoreAttachmentFile storeAttachmentFile : storeAttachmentFiles) {
+            storeAttachmentFile.setDel(true); // storeAttachmentFile 업데이트
+
+            AttachmentFile attachmentFile = storeAttachmentFile.getAttachmentFile();
+            attachmentFile.setDel(true); // AttachmentFile 업데이트
+        }
+
+
+
+        // 변경된 내용을 저장
+        attachmentFileService.deleteStoreAttachmentFiles(storeAttachmentFiles);
+        attachmentFileService.deleteAttachmentFiles(storeAttachmentFiles);
+
 
         storeRepository.deleteById(storeId);
     }

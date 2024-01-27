@@ -7,12 +7,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StoreRepositoryCustom {
-    List<StoreDto.DetailInfo> findAllStore(StoreDto.RequestSearchDto requestSearchDto);
+    List<StoreDto.DetailInfo> findStore(StoreDto.RequestSearchDto requestSearchDto);
 
+    boolean isExists(Long storeId);
 
     boolean isExistStoreName(Long adminId, String name, Long storeId);
 
     StoreDto.DetailInfo findOneById(Long storeId);
 
     Store findOneByIdToEntity(Long storeId);
+
+    void deleteById(Long storeId);
 }
