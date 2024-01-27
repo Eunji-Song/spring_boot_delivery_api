@@ -9,13 +9,11 @@ import com.example.deliveryadmin.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.SQLDelete;
 
 @Entity
-@Table(name = "store")
 @Getter
+@Table(name = "store")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = "member")
 public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +22,7 @@ public class Store extends BaseEntity {
 
     // 소유주
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id", nullable = false, updatable = false)
+    @JoinColumn(name = "admin_id",nullable = false, updatable = false)
     private Member member;
 
     @Column(nullable = false)
@@ -35,8 +33,7 @@ public class Store extends BaseEntity {
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    @ColumnDefault("'OPERATING'")
-    private StoreStatus status = StoreStatus.OPERATING;
+    private StoreStatus status;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
@@ -48,10 +45,9 @@ public class Store extends BaseEntity {
     @Embedded
     private OpeningHours openingHours;
 
-
     @Column(nullable = false)
     @ColumnDefault("false")
-    private boolean isDel = true;
+    private boolean isDel;
 
     @Builder(toBuilder = true)
     public Store(Long id, Member member, String name, String description, StoreStatus status, StoreCategory category, Address address, OpeningHours openingHours, boolean isDel) {
@@ -64,9 +60,5 @@ public class Store extends BaseEntity {
         this.address = address;
         this.openingHours = openingHours;
         this.isDel = isDel;
-    }
-
-    public void setMember(Member member) {
-        this.member = member;
     }
 }

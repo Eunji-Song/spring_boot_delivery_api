@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -34,6 +36,9 @@ public class Product extends BaseEntity {
 
     @Column(nullable = false)
     private int price;
+
+//    @OneToMany(cascade = CascadeType.ALL)
+//    private List<AttachmentFile> attachmentFiles;
 
     @ColumnDefault(value = "false")
     boolean isBest;

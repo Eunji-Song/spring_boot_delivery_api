@@ -4,6 +4,8 @@ import com.example.deliveryadmin.common.embeded.Address;
 import com.example.deliveryadmin.common.embeded.OpeningHours;
 import com.example.deliveryadmin.common.enums.StoreCategory;
 import com.example.deliveryadmin.common.enums.StoreStatus;
+import com.example.deliveryadmin.common.fileupload.dto.AttachmentFileDto;
+import com.example.deliveryadmin.common.fileupload.dto.StoreAttachmentFileDto;
 import com.example.deliveryadmin.domain.member.Member;
 import com.example.deliveryadmin.domain.member.MemberDto;
 import com.querydsl.core.annotations.QueryProjection;
@@ -11,7 +13,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import lombok.extern.java.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StoreDto {
     // === Request(역직렬화) === //
@@ -72,9 +76,12 @@ public class StoreDto {
             this.status = status;
         }
 
+
+        // StoreService - save DTO에 사용자 정보 할당 할 때 사용
         public void setMember(Member member) {
             this.member = new MemberDto.DetailInfo(member);
         }
+
     }
 
     /**
@@ -82,6 +89,7 @@ public class StoreDto {
      */
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @Builder
     public static class RequestUpdateDto {
         @NotBlank(message = "매장명을 입력해주세요.")
         @Size(max = 20)
@@ -113,10 +121,8 @@ public class StoreDto {
 
     // === Response(직렬화) === //
 
-
     @Getter
     @ToString
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class DetailInfo {
         private Long id;
 
@@ -132,17 +138,73 @@ public class StoreDto {
 
         private StoreStatus status;
 
-        @QueryProjection
-        public DetailInfo(Long id, String name, String description, Address address, OpeningHours openingHours, StoreCategory category, StoreStatus status) {
-            this.id = id;
-            this.name = name;
-            this.description = description;
-            this.address = address;
-            this.openingHours = openingHours;
-            this.category = category;
-            this.status = status;
+        private MemberDto.DetailInfo member;
+
+        private StoreAttachmentFileDto.Thumbnail thumbnail;
+
+
+        private List<StoreAttachmentFileDto.DetailImages> detailImages = new ArrayList<>();
+
+
+        public DetailInfo() {
         }
 
+        @QueryProjection
+        public DetailInfo(Store store, Member member) {
+            // store
+            this.id = store.getId();
+            this.name = store.getName();
+            this.description = store.getDescription();
+            this.address = store.getAddress();
+            this.openingHours = store.getOpeningHours();
+            this.category = store.getCategory();
+            this.status = store.getStatus();
 
+            // member
+            this.member = new MemberDto.DetailInfo(member);
+
+            // 썸네일
+            this.thumbnail = null;
+
+            // 상세 이미지
+            this.detailImages = new ArrayList<>();
+        }
+
+        public DetailInfo(StoreDto.DetailInfo detailInfo, StoreAttachmentFileDto.Thumbnail thumbnail, List<StoreAttachmentFileDto.DetailImages> detailImages) {
+            // store
+            this.id = detailInfo.getId();
+            this.name = detailInfo.getName();
+            this.description = detailInfo.getDescription();
+            this.address = detailInfo.getAddress();
+            this.openingHours = detailInfo.getOpeningHours();
+            this.category = detailInfo.getCategory();
+            this.status = detailInfo.getStatus();
+
+            // member
+            this.member = detailInfo.getMember();
+
+            this.thumbnail = thumbnail;
+            this.detailImages = detailImages;
+
+        }
+    }
+
+    @Getter
+    @ToString
+    public static class ListViewData {
+        private Long id;
+
+        private String name;
+
+        private Address address;
+
+        private StoreCategory category;
+
+        private StoreStatus status;
+
+        private StoreAttachmentFileDto.Thumbnail thumbnail;
+
+        public ListViewData() {
+        }
     }
 }

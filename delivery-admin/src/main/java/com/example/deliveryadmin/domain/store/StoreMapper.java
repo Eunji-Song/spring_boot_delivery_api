@@ -1,14 +1,13 @@
 package com.example.deliveryadmin.domain.store;
 
-import com.example.deliveryadmin.domain.auth.AuthMapper;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring", builder = @Builder(buildMethod = "build"))
+@Mapper(componentModel = "spring")
 public interface StoreMapper {
-    AuthMapper INSTANCE = Mappers.getMapper(AuthMapper.class);
+    StoreMapper INSTANCE = Mappers.getMapper(StoreMapper.class);
 
-    StoreDto.DetailInfo storeToDetailDto(Store store);
+//    StoreDto.DetailInfo Sto(Store store);
 
 
     Store saveDtoToEntity(StoreDto.RequestSaveDto requestSaveDto);

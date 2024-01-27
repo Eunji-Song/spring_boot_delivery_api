@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,4 +33,7 @@ public class Review extends BaseEntity {
     private int score; // 평가 점수
 
     private String content;
+
+//    @OneToMany(cascade = CascadeType.ALL)
+//    private List<AttachmentFile> attachmentFiles;
 }
