@@ -1,6 +1,8 @@
 package com.example.deliveryadmin.common.fileupload;
 
 import com.example.deliveryadmin.common.exception.fileupload.InvalidFileException;
+import com.example.deliveryadmin.common.fileupload.repository.AttachmentFileRepository;
+import com.example.deliveryadmin.domain.store.Store;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +22,9 @@ import java.util.UUID;
 public class AttachmentFileService {
     @Value("${file.dir}")
     private String uploadDir;
+
+    private final AttachmentFileMapper attachmentFileMapper;
+    private final AttachmentFileRepository attachmentFileRepository;
 
 
     // == 파일 유효성 검사 === //
@@ -86,4 +91,19 @@ public class AttachmentFileService {
         return fileDto;
     }
 
+
+    // == 엔티티에 store 값 세팅 후 mapping == //
+    public Long saveStoreAttachmentFileInfo(AttachmentFileDto attachmentFileDto, Store store) {
+        log.error("[AttachmentFileService:setStoreAttachmentFileEntity] 파일 DTO mapping");
+        attachmentFileDto.setStore(store);
+
+        AttachmentFile entity = attachmentFileMapper.dtoToEntity(attachmentFileDto);
+        attachmentFileRepository.save(entity);
+
+        return entity.getId();
+    }
+
+    public void deleteFileInfo(Long attachmentFileId) {
+        attachmentFileRepository.deleteAttachmentFileInfo(attachmentFileId);
+    }
 }

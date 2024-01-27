@@ -9,9 +9,9 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
+@Table(uniqueConstraints = {})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
 public class AttachmentFile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,33 +33,44 @@ public class AttachmentFile {
     @Column(nullable = false)
     private Long fileSize;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
-    private Store store;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
-    private Review review;
-
     @ColumnDefault(value = "false")
     private boolean isDel = false;
 
-    @Builder
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
-    public AttachmentFile(Long id, String originFileName, String fileName, String filePath, String fileType, Long fileSize, Store store, Product product, Review review, boolean isDel) {
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id")
+    private Review review;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    @Builder(toBuilder = true)
+    public AttachmentFile(Long id, String originFileName, String fileName, String filePath, String fileType, Long fileSize, boolean isDel, Store store, Review review, Product product) {
         this.id = id;
         this.originFileName = originFileName;
         this.fileName = fileName;
         this.filePath = filePath;
         this.fileType = fileType;
         this.fileSize = fileSize;
-        this.store = store;
-        this.product = product;
-        this.review = review;
         this.isDel = isDel;
+        this.store = store;
+        this.review = review;
+        this.product = product;
+    }
+
+    @Builder
+    public AttachmentFile(Long id, String originFileName, String fileName, String filePath, String fileType, Long fileSize, boolean isDel, Store store) {
+        this.id = id;
+        this.originFileName = originFileName;
+        this.fileName = fileName;
+        this.filePath = filePath;
+        this.fileType = fileType;
+        this.fileSize = fileSize;
+        this.isDel = isDel;
+        this.store = store;
     }
 }
