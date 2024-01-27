@@ -96,13 +96,17 @@ public class MemberDto {
             this.email = email;
         }
 
-        // Entity -> Dto
+        // 매개변수를 Member 엔티티로 받은 경우 DTO로 변환하여 리턴
         public DetailInfo(Member member) {
             this.id = member.getId();
             this.accountId = member.getAccountId();
             this.name = member.getName();
             this.email = member.getEmail();
         }
+
+
+
+
 
     }
 
