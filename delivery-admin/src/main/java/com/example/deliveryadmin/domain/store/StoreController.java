@@ -3,12 +3,17 @@ package com.example.deliveryadmin.domain.store;
 import com.example.deliveryadmin.common.response.ApiResponse;
 import com.example.deliveryadmin.common.response.ApiResult;
 import com.example.deliveryadmin.common.response.ResultCode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Store - 매장 관리")
 @RestController
@@ -35,16 +40,22 @@ public class StoreController {
      */
     @GetMapping("/{storeId}")
     public ApiResult getStoreById(@PathVariable Long storeId) {
-        return ApiResponse.success(storeService.getStoreById(storeId));
+        StoreDto.DetailInfo storeDto = storeService.getStoreById(storeId);
+        return ApiResponse.success(storeDto);
     }
 
     /**
      * 매장 등록
      */
-    @PostMapping("")
-    public ApiResult save(@Valid @RequestBody StoreDto.RequestSaveDto requestSaveDto, Authentication authentication) {
-        Long stroeId = storeService.save(requestSaveDto);
-        return ApiResponse.success(ResultCode.SUCCESS, stroeId);
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(description = "가게 신규 등록")
+    public ApiResult<Object> save(@RequestPart(name = "request") @Valid StoreDto.RequestSaveDto requestSaveDto
+                                , @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail
+                                , Authentication authentication) {
+
+        Long storeId = storeService.save(requestSaveDto, thumbnail);
+
+        return ApiResponse.success(ResultCode.SUCCESS, storeId);
     }
 
 
@@ -52,8 +63,8 @@ public class StoreController {
      * 매장 정보 수정
      */
     @PutMapping("/{storeId}")
-    public ApiResult update(@PathVariable Long storeId, @Valid @RequestBody StoreDto.RequestUpdateDto requestUpdateDto) {
-        storeService.update(storeId, requestUpdateDto);
+    public ApiResult update(@PathVariable Long storeId, @RequestPart(name = "request") @Valid StoreDto.RequestUpdateDto requestUpdateDto, @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail) {
+        storeService.update(storeId, requestUpdateDto, thumbnail);
         return ApiResponse.success(ResultCode.SUCCESS, storeId);
     }
 

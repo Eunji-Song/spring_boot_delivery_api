@@ -2,29 +2,32 @@ package com.example.deliveryadmin.domain.store;
 
 import com.example.deliveryadmin.common.embeded.Address;
 import com.example.deliveryadmin.common.embeded.OpeningHours;
+import com.example.deliveryadmin.common.fileupload.AttachmentFile;
 import com.example.deliveryadmin.common.entity.BaseEntity;
 import com.example.deliveryadmin.common.enums.StoreCategory;
 import com.example.deliveryadmin.common.enums.StoreStatus;
 import com.example.deliveryadmin.domain.member.Member;
+import com.querydsl.core.annotations.QueryProjection;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.SQLDelete;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "store")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = "member")
 public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "store_id")
+    @Column(name = "store_id", insertable = false, updatable = false)
     private Long id;
 
     // 소유주
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id", nullable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "admin_id",nullable = false, updatable = false)
     private Member member;
 
     @Column(nullable = false)
@@ -35,8 +38,7 @@ public class Store extends BaseEntity {
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    @ColumnDefault("'OPERATING'")
-    private StoreStatus status = StoreStatus.OPERATING;
+    private StoreStatus status;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
@@ -48,13 +50,20 @@ public class Store extends BaseEntity {
     @Embedded
     private OpeningHours openingHours;
 
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<AttachmentFile> thumbnails = new ArrayList<>();
 
     @Column(nullable = false)
     @ColumnDefault("false")
-    private boolean isDel = true;
+    private boolean isDel;
+
+    public Store() {
+
+    }
 
     @Builder(toBuilder = true)
-    public Store(Long id, Member member, String name, String description, StoreStatus status, StoreCategory category, Address address, OpeningHours openingHours, boolean isDel) {
+    @QueryProjection
+    public Store(Long id, Member member, String name, String description, StoreStatus status, StoreCategory category, Address address, OpeningHours openingHours, List<AttachmentFile> thumbnails, boolean isDel) {
         this.id = id;
         this.member = member;
         this.name = name;
@@ -63,10 +72,20 @@ public class Store extends BaseEntity {
         this.category = category;
         this.address = address;
         this.openingHours = openingHours;
+        this.thumbnails = thumbnails;
         this.isDel = isDel;
     }
 
+
+
+    @Builder
     public void setMember(Member member) {
         this.member = member;
     }
+
+    public Member member() {
+        return member;
+    }
+
+
 }
