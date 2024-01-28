@@ -4,11 +4,12 @@ import com.example.deliveryadmin.common.embeded.Address;
 import com.example.deliveryadmin.common.embeded.OpeningHours;
 import com.example.deliveryadmin.common.enums.StoreCategory;
 import com.example.deliveryadmin.common.enums.StoreStatus;
-import com.example.deliveryadmin.common.fileupload.dto.AttachmentFileDto;
-import com.example.deliveryadmin.common.fileupload.dto.StoreAttachmentFileDto;
+import com.example.deliveryadmin.common.fileupload.store.StoreAttachmentFile;
+import com.example.deliveryadmin.common.fileupload.store.StoreAttachmentFileDto;
 import com.example.deliveryadmin.domain.member.Member;
 import com.example.deliveryadmin.domain.member.MemberDto;
 import com.querydsl.core.annotations.QueryProjection;
+import jakarta.persistence.Convert;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,6 +17,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StoreDto {
     // === Request(역직렬화) === //
@@ -24,8 +26,8 @@ public class StoreDto {
      * 전체 목록 조회
      * 필터링 대상 : 카테고리, 운영 상태, 매장명
      */
+    @ToString
     @Getter
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class RequestSearchDto {
         private StoreCategory category;
         private StoreStatus status;
@@ -35,6 +37,9 @@ public class StoreDto {
             this.category = category;
             this.status = status;
             this.name = name;
+        }
+
+        public RequestSearchDto() {
         }
     }
 
@@ -142,7 +147,6 @@ public class StoreDto {
 
         private StoreAttachmentFileDto.Thumbnail thumbnail;
 
-
         private List<StoreAttachmentFileDto.DetailImages> detailImages = new ArrayList<>();
 
 
@@ -164,10 +168,12 @@ public class StoreDto {
             this.member = new MemberDto.DetailInfo(member);
 
             // 썸네일
-            this.thumbnail = null;
-
-            // 상세 이미지
-            this.detailImages = new ArrayList<>();
+//            this.thumbnail = new StoreAttachmentFileDto.Thumbnail(store.getThumbnail());
+//
+//            // 상세 이미지
+//            List<StoreAttachmentFileDto.DetailImages> detailImagesList = new ArrayList<>();
+//            detailImagesList = store.getDetailImages().stream().map(StoreAttachmentFileDto.DetailImages::new).collect(Collectors.toList());
+//            this.detailImages = detailImagesList;
         }
 
         public DetailInfo(StoreDto.DetailInfo detailInfo, StoreAttachmentFileDto.Thumbnail thumbnail, List<StoreAttachmentFileDto.DetailImages> detailImages) {
@@ -205,6 +211,26 @@ public class StoreDto {
         private StoreAttachmentFileDto.Thumbnail thumbnail;
 
         public ListViewData() {
+        }
+
+        @QueryProjection
+        public ListViewData(Long id, String name, Address address, StoreCategory category, StoreStatus status, StoreAttachmentFileDto.Thumbnail thumbnail) {
+            this.id = id;
+            this.name = name;
+            this.address = address;
+            this.category = category;
+            this.status = status;
+            this.thumbnail = thumbnail;
+        }
+
+        @QueryProjection
+        public ListViewData(Long id, String name, Address address, StoreCategory category, StoreStatus status, StoreAttachmentFile thumbnail) {
+            this.id = id;
+            this.name = name;
+            this.address = address;
+            this.category = category;
+            this.status = status;
+            this.thumbnail = new StoreAttachmentFileDto.Thumbnail(thumbnail);
         }
     }
 }

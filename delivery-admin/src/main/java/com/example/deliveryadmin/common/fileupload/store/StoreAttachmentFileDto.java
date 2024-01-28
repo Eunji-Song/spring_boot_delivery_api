@@ -1,11 +1,12 @@
-package com.example.deliveryadmin.common.fileupload.dto;
+package com.example.deliveryadmin.common.fileupload.store;
 
-import com.example.deliveryadmin.common.fileupload.entity.AttachmentFile;
-import com.example.deliveryadmin.common.fileupload.entity.StoreAttachmentFile;
+import com.example.deliveryadmin.common.fileupload.attachment.AttachmentFile;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 public class StoreAttachmentFileDto {
     /**
@@ -23,11 +24,11 @@ public class StoreAttachmentFileDto {
         private String filePath;
 
         @QueryProjection
-        public Thumbnail(StoreAttachmentFile storeAttachmentFile, AttachmentFile attachmentFile) {
+        public Thumbnail(StoreAttachmentFile storeAttachmentFile) {
             this.id = storeAttachmentFile.getId();
-            this.originFileName = attachmentFile.getOriginFileName();
-            this.fileName = attachmentFile.getFileName();
-            this.filePath = attachmentFile.getFilePath();
+            this.originFileName = storeAttachmentFile.getOriginFileName();
+            this.fileName = storeAttachmentFile.getFileName();
+            this.filePath = storeAttachmentFile.getFilePath();
         }
     }
 
@@ -48,12 +49,14 @@ public class StoreAttachmentFileDto {
         private Long fileSize;
 
         @QueryProjection
-        public DetailImages(StoreAttachmentFile storeAttachmentFile, AttachmentFile attachmentFile) {
+        public DetailImages(StoreAttachmentFile storeAttachmentFile) {
             this.id = storeAttachmentFile.getId();
-            this.originFileName = attachmentFile.getOriginFileName();
-            this.fileName = attachmentFile.getFileName();
-            this.filePath = attachmentFile.getFilePath();
-            this.fileSize = attachmentFile.getFileSize();
+            this.originFileName = storeAttachmentFile.getOriginFileName();
+            this.fileName = storeAttachmentFile.getFileName();
+            this.filePath = storeAttachmentFile.getFilePath();
+            this.fileSize = storeAttachmentFile.getFileSize();
         }
+
+
     }
 }

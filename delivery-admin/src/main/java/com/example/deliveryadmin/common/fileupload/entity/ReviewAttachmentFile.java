@@ -1,5 +1,6 @@
 package com.example.deliveryadmin.common.fileupload.entity;
 
+import com.example.deliveryadmin.common.fileupload.attachment.AttachmentFile;
 import com.example.deliveryadmin.domain.review.Review;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
