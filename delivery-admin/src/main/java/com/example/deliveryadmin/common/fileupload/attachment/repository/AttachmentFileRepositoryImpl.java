@@ -1,4 +1,4 @@
-package com.example.deliveryadmin.common.fileupload.repository.attachment;
+package com.example.deliveryadmin.common.fileupload.attachment.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

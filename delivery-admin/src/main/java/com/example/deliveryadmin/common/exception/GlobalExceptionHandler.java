@@ -74,7 +74,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error("handleTypeMismatch caught: {}", ex.getMessage());
 
-        ApiResult apiResult = new ApiResult(ResultCode.BAD_REQUEST, "파라미터 값을 확인해주세요.");
+        String message = "파라미터 값을 확인해주세요.";
+        if (ex.getPropertyName() != null) {
+            message = ex.getPropertyName()  +  " 파라미터 값을 확인해주세요.";
+        }
+
+
+        ApiResult apiResult = new ApiResult(ResultCode.BAD_REQUEST, message);
         return new ResponseEntity<>(apiResult, headers, HttpStatus.OK);
     }
 

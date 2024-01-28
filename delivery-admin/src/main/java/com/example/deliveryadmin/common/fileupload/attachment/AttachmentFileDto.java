@@ -1,18 +1,6 @@
-package com.example.deliveryadmin.common.fileupload.dto;
+package com.example.deliveryadmin.common.fileupload.attachment;
 
-import com.example.deliveryadmin.common.fileupload.entity.AttachmentFile;
-import com.example.deliveryadmin.common.fileupload.entity.StoreAttachmentFile;
-import com.example.deliveryadmin.domain.product.Product;
-import com.example.deliveryadmin.domain.review.Review;
-import com.example.deliveryadmin.domain.store.Store;
-import com.example.deliveryadmin.domain.store.StoreDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public class AttachmentFileDto {

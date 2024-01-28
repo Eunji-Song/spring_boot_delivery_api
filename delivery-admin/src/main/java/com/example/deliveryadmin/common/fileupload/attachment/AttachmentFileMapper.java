@@ -1,4 +1,4 @@
-package com.example.deliveryadmin.common.fileupload;
+package com.example.deliveryadmin.common.fileupload.attachment;
 
 import org.mapstruct.Mapper;
 

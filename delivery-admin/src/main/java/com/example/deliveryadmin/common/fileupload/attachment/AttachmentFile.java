@@ -1,5 +1,6 @@
-package com.example.deliveryadmin.common.fileupload.entity;
+package com.example.deliveryadmin.common.fileupload.attachment;
 
+import com.example.deliveryadmin.common.entity.BaseEntity;
 import com.example.deliveryadmin.domain.store.Store;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +14,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AttachmentFile {
+public class AttachmentFile extends BaseEntity  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "attachment_file_id")

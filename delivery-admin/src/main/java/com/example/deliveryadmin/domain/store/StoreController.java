@@ -1,8 +1,11 @@
 package com.example.deliveryadmin.domain.store;
 
+import com.example.deliveryadmin.common.enums.StoreCategory;
+import com.example.deliveryadmin.common.enums.StoreStatus;
 import com.example.deliveryadmin.common.response.ApiResponse;
 import com.example.deliveryadmin.common.response.ApiResult;
 import com.example.deliveryadmin.common.response.ResultCode;
+import com.example.deliveryadmin.common.util.PagingUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,7 +14,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -34,11 +40,21 @@ public class StoreController {
      * limit : 30
      */
     @GetMapping("")
-    public ApiResult getAllStores(StoreDto.RequestSearchDto requestSearchDto, Pageable pageable) {
-        storeService.getAllStores(requestSearchDto, pageable);
-        return ApiResponse.success();
-    }
+    public ApiResult getAllStores(
+            @RequestParam(required = false) StoreCategory storeCategory
+            , @RequestParam(required = false) StoreStatus storeStatus
+            , @RequestParam(required = false) String name
+            , @RequestParam(defaultValue = "0") int page
+            , @RequestParam(defaultValue = "10") int size
+            , @RequestParam(defaultValue = "storeId") String sort
+            , @RequestParam(defaultValue = "DESC") String dir) {
 
+        // 페이징 정보 생성
+        Pageable pageable = PagingUtil.getPageable(page, size, sort, dir);
+
+        List<StoreDto.ListViewData> list = storeService.getAllStores(storeCategory, storeStatus, name, pageable);
+        return ApiResponse.success(list);
+    }
 
 
     /**
@@ -59,9 +75,7 @@ public class StoreController {
                                 , @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail
                                 , @RequestPart(name = "detailImages", required = false) MultipartFile[] detailImages
                                 , Authentication authentication) {
-
         Long storeId = storeService.save(requestSaveDto, thumbnail, detailImages);
-
         return ApiResponse.success(ResultCode.SUCCESS, storeId);
     }
 
@@ -69,10 +83,15 @@ public class StoreController {
     /**
      * 매장 정보 수정
      */
-    @PutMapping("/{storeId}")
-    public ApiResult update(@PathVariable Long storeId, @RequestPart(name = "request") @Valid StoreDto.RequestUpdateDto requestUpdateDto, @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail) {
-        storeService.update(storeId, requestUpdateDto, thumbnail);
-        return ApiResponse.success(ResultCode.SUCCESS, storeId);
+    @PutMapping(value = "/{storeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiResult update(@PathVariable Long storeId
+                            , @RequestPart(name = "request") @Valid StoreDto.RequestUpdateDto requestUpdateDto
+                            , @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail
+                            , @RequestPart(name = "detailImages", required = false) MultipartFile[] detailImages
+                            , @RequestPart(name = "deleteFilesIdList",required = false) List<Integer> deleteFilesIdList) {
+        storeService.update(storeId, requestUpdateDto, thumbnail, detailImages, deleteFilesIdList);
+
+        return ApiResponse.success(ResultCode.SUCCESS);
     }
 
     /**
