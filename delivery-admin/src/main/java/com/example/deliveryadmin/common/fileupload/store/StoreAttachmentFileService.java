@@ -1,6 +1,7 @@
 package com.example.deliveryadmin.common.fileupload.store;
 
 import com.example.deliveryadmin.common.fileupload.store.repository.StoreAttachmentFileRepository;
+import com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,15 +15,15 @@ import java.util.List;
 public class StoreAttachmentFileService {
     private final StoreAttachmentFileRepository storeAttachmentFileRepository;
 
-    public Long saveInfo(StoreAttachmentFile storeAttachmentFile) {
+    public Long saveInfo(com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile storeAttachmentFile) {
         return storeAttachmentFileRepository.save(storeAttachmentFile).getId();
     }
 
-    public void saveList(List<StoreAttachmentFile> detailImageList) {
+    public void saveList(List<com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile> detailImageList) {
         storeAttachmentFileRepository.saveAll(detailImageList);
     }
 
-    public void deketeFiles(List<StoreAttachmentFile> storeAttachmentFiles) {
+    public void deketeFiles(List<com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile> storeAttachmentFiles) {
         storeAttachmentFileRepository.saveAll(storeAttachmentFiles);
     }
 

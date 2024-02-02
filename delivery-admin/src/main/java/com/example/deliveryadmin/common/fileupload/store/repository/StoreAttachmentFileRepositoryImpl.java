@@ -1,7 +1,6 @@
 package com.example.deliveryadmin.common.fileupload.store.repository;
 
-import com.example.deliveryadmin.common.fileupload.attachment.QAttachmentFile;
-import com.example.deliveryadmin.common.fileupload.store.QStoreAttachmentFile;
+import com.example.deliverycore.entity.attachmentfile.QStoreAttachmentFile;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

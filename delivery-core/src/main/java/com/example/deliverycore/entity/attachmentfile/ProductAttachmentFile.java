@@ -1,7 +1,8 @@
-package com.example.deliveryadmin.common.fileupload.product;
+package com.example.deliverycore.entity.attachmentfile;
 
-import com.example.deliveryadmin.common.fileupload.attachment.AttachmentFile;
-import com.example.deliveryadmin.domain.product.Product;
+import com.example.deliverycore.embeded.AttachmentFile;
+import com.example.deliverycore.entity.Product;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,6 @@ import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE product_attachment_file SET is_del = 1 WHERE product_attachment_file_id = ?")
 public class ProductAttachmentFile {
@@ -46,8 +46,12 @@ public class ProductAttachmentFile {
     @Column(nullable = false)
     private Long fileSize;
 
+    @JsonIgnore
     @ColumnDefault(value = "false")
     private boolean isDel = false;
+
+    public ProductAttachmentFile() {
+    }
 
     public ProductAttachmentFile(AttachmentFile attachmentFile) {
         this.originFileName = attachmentFile.getOriginFileName();
@@ -57,7 +61,20 @@ public class ProductAttachmentFile {
         this.fileSize = attachmentFile.getFileSize();
     }
 
+    public ProductAttachmentFile(String originFileName, String fileName, String filePath, String fileType, Long fileSize) {
+        this.originFileName = originFileName;
+        this.fileName = fileName;
+        this.filePath = filePath;
+        this.fileType = fileType;
+        this.fileSize = fileSize;
+    }
+
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+
+    public void setDel(boolean del) {
+        isDel = del;
     }
 }

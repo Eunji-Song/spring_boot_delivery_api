@@ -1,5 +1,6 @@
 package com.example.deliveryadmin.domain.product;
 
+import com.example.deliverycore.entity.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;

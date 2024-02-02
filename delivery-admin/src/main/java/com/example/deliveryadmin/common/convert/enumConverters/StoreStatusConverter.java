@@ -1,7 +1,7 @@
 package com.example.deliveryadmin.common.convert.enumConverters;
 
-import com.example.deliveryadmin.common.enums.StoreCategory;
-import com.example.deliveryadmin.common.enums.StoreStatus;
+import com.example.deliverycore.enums.StoreCategory;
+import com.example.deliverycore.enums.StoreStatus;
 import org.springframework.core.convert.converter.Converter;
 
 public class StoreStatusConverter implements Converter<String, StoreStatus> {

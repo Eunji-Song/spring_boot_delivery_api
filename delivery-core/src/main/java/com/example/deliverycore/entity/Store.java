@@ -1,24 +1,25 @@
-package com.example.deliveryadmin.domain.store;
+package com.example.deliverycore.entity;
 
-import com.example.deliveryadmin.common.embeded.Address;
-import com.example.deliveryadmin.common.embeded.OpeningHours;
-import com.example.deliveryadmin.common.entity.BaseEntity;
-import com.example.deliveryadmin.common.enums.StoreCategory;
-import com.example.deliveryadmin.common.enums.StoreStatus;
-import com.example.deliveryadmin.common.fileupload.store.StoreAttachmentFile;
-import com.example.deliveryadmin.domain.member.Member;
+import com.example.deliverycore.embeded.Address;
+import com.example.deliverycore.embeded.OpeningHours;
+import com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile;
+import com.example.deliverycore.enums.StoreCategory;
+import com.example.deliverycore.enums.StoreStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//@ToString(exclude = {"meber", "thumbnail", "detailImages"})
+@ToString
 @Entity
 @Getter
 @Table(name = "store")
-@ToString
+@SQLDelete(sql = "UPDATE store SET is_del = 1 WHERE store_id = ?")
 public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,12 +55,13 @@ public class Store extends BaseEntity {
     @ColumnDefault("false")
     private boolean isDel;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "thumbnail_id")
     private StoreAttachmentFile thumbnail = null;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "store")
     private List<StoreAttachmentFile> detailImages = new ArrayList<>();
+
 
     public Store() {
     }
@@ -87,6 +89,10 @@ public class Store extends BaseEntity {
         this.status = status;
         this.address = address;
         this.openingHours = openingHours;
+    }
+
+    public Store(Long id) {
+        this.id = id;
     }
 
     public void setThumbnail(StoreAttachmentFile thumbnail) {

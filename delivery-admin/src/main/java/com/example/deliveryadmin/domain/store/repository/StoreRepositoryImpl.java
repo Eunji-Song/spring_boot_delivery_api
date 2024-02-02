@@ -1,18 +1,27 @@
 package com.example.deliveryadmin.domain.store.repository;
 
-import com.example.deliveryadmin.common.enums.StoreCategory;
-import com.example.deliveryadmin.common.enums.StoreStatus;
-import com.example.deliveryadmin.common.exception.store.StoreNotFoundException;
-import com.example.deliveryadmin.common.fileupload.attachment.QAttachmentFile;
+import com.example.deliveryadmin.common.fileupload.dto.StoreAttachmentFileDto;
+import com.example.deliverycore.entity.QMember;
+import com.example.deliverycore.entity.QStore;
+import com.example.deliverycore.entity.Store;
+import com.example.deliverycore.entity.attachmentfile.QStoreAttachmentFile;
+import com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile;
+import com.example.deliverycore.enums.StoreCategory;
+import com.example.deliverycore.enums.StoreStatus;
 import com.example.deliveryadmin.common.fileupload.store.*;
-import com.example.deliveryadmin.domain.member.QMember;
 import com.example.deliveryadmin.domain.store.*;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +35,27 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
     private QMember member;
     private QStoreAttachmentFile storeAttachmentFile;
 
+    private OrderSpecifier<?>[] getSort(Sort sort) {
+        log.info("sort : {}", sort);
+
+        return sort.stream()
+                .map(order -> {
+                    ComparableExpressionBase<?> comparableExpressionBase = Expressions.comparablePath(Comparable.class, store, order.getProperty());
+                    return order.isAscending() ? comparableExpressionBase.asc() : comparableExpressionBase.desc();
+                })
+                .toArray(OrderSpecifier[]::new);
+    }
+
+
 
     @Override
-    public List<StoreDto.ListViewData> findStore(StoreCategory storeCategory, StoreStatus storeStatus, String name, Pageable pageable) {
+    public Page<StoreDto.ListViewData> findStore(StoreCategory storeCategory, StoreStatus storeStatus, String name, Pageable pageable) {
         store = new QStore("s");
 
         // WHERE 문 생성
         BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        booleanBuilder.and(store.isDel.isFalse());
 
         if (storeCategory != null) {
             booleanBuilder.and(store.category.eq(storeCategory));
@@ -46,19 +69,19 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
             booleanBuilder.and(store.name.contains(name));
         }
 
-        log.info("list query");
-        List<StoreDto.ListViewData> list = jpaQueryFactory.select(new QStoreDto_ListViewData(store.id, store.name, store.address, store.category, store.status, store.thumbnail)).from(store).where(booleanBuilder).fetch();
+        QueryResults<StoreDto.ListViewData> results = jpaQueryFactory
+                                            .select(new QStoreDto_ListViewData(store.id, store.name, store.address, store.category, store.status, store.thumbnail))
+                                            .from(store)
+                                            .where(booleanBuilder)
+                                            .orderBy(getSort(pageable.getSort()))
+                                            .offset(pageable.getOffset())
+                                            .limit(pageable.getPageSize())
+                                            .fetchResults();
 
+        List<StoreDto.ListViewData> content = results.getResults();
+        long total = results.getTotal();
 
-//        jpaQueryFactory.select(store)
-
-
-//        jpaQueryFactory.select(QStoreDto_ListViewData(store.id, store.name, store.address, store.category, store.status))
-
-
-        return list;
-
-
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
@@ -85,7 +108,6 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 
     @Override
     public boolean isExists(Long storeId) {
-        log.info("[StoreRepositoryImpl:isExists] 가게 중복 여부 확인");
         store = new QStore("s");
 
         return jpaQueryFactory
@@ -100,49 +122,26 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
         log.info("[StoreRepositoryImpl:findOneById] 게시글 상세 조회");
 
         store = new QStore("store");
-        member = new QMember("member");
+        storeAttachmentFile = new QStoreAttachmentFile("saf");
 
-
-        // store, member 데이터 호출
-        log.info("[StoreRepositoryImpl:findOneById] 매장, 사용자 정보 조회");
-
-        StoreDto.DetailInfo storeAndMemberInfo = jpaQueryFactory.select(new QStoreDto_DetailInfo(store, member))
+        // 기본 정보 + 썸네일
+        StoreDto.DetailInfo detailInfo = jpaQueryFactory.select(new QStoreDto_DetailInfo(store))
                 .from(store)
-                .leftJoin(store.member, member).fetchJoin()
-                .where(store.id.eq(storeId), store.isDel.isFalse())
+                .where(store.isDel.isFalse(), store.id.eq(storeId))
                 .fetchOne();
 
-
-        // 매장, 사용자 정보가 존재하지 않는 경우 Notfound 발생(필수)
-        if (storeAndMemberInfo == null) {
-            throw new StoreNotFoundException();
+        // 상세 이미지
+        List<StoreAttachmentFileDto.DetailImages> detailImages = new ArrayList<>();
+        if (detailInfo != null) {
+            detailImages = jpaQueryFactory.select(new QStoreAttachmentFileDto_DetailImages(storeAttachmentFile))
+                    .from(storeAttachmentFile)
+                    .where(storeAttachmentFile.store.id.eq(storeId), storeAttachmentFile.isDel.isFalse())
+                    .fetch();
         }
 
 
-        // == 파일 관련 코드 == //
-        storeAttachmentFile = new QStoreAttachmentFile("b");
-
-
-        // 썸네일 호출
-        log.info("[StoreRepositoryImpl:findOneById] 썸네일 조회");
-
-        StoreAttachmentFileDto.Thumbnail thumbnail = jpaQueryFactory
-                .select(new QStoreAttachmentFileDto_Thumbnail(storeAttachmentFile))
-                .from(storeAttachmentFile)
-                .where(storeAttachmentFile.isThumbnail.isTrue(), storeAttachmentFile.store.id.eq(storeAndMemberInfo.getId()), storeAttachmentFile.isDel.isFalse())
-                .fetchOne();
-
-
-        // 상세 이미지
-        log.info("[StoreRepositoryImpl:findOneById] 상세 이미지 조회 ");
-
-        List<StoreAttachmentFileDto.DetailImages> detailImages = jpaQueryFactory.select(new QStoreAttachmentFileDto_DetailImages(storeAttachmentFile))
-                .from(storeAttachmentFile)
-                .where(storeAttachmentFile.isDetailImage.isTrue(), storeAttachmentFile.store.id.eq(storeAndMemberInfo.getId()), storeAttachmentFile.isDel.isFalse())
-                .fetch();
-
-        return new StoreDto.DetailInfo(storeAndMemberInfo, thumbnail, detailImages);
-
+        // 상세 이미지 조회
+        return new StoreDto.DetailInfo(detailInfo, detailImages);
     }
 
     @Override
@@ -152,48 +151,33 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
         store = new QStore("s");
         storeAttachmentFile = new QStoreAttachmentFile("saf");
 
-        // 기본 정보 리턴
-//        jpaQueryFactory.select()
-//                .from(store)
-//                .where(store.isDel.isFalse(), store.id.eq(storeId))
-//                .fetchFirst();
-
-//        log.info("entity : {}", storeEntity.getDetailImages());
-
-//        log.info("thumbnail도 갸져와 ");
-//        jpaQueryFactory.select(Projections.fields(store.id, store.thumbnail))
-//                .from(store)
-//                .where(store.isDel.isFalse(), store.id.eq(storeId))
-//                .fetch();
-
-
-        // 썸네일 정보 리턴
-//        log.info("썸네일 정보 리턴");
-//        storeAttachmentFile = new QStoreAttachmentFile("saf");
-//        Long thumbnailId = jpaQueryFactory.select(storeAttachmentFile.id)
-//                .from(storeAttachmentFile)
-//                .where(storeAttachmentFile.isDel.isFalse(), storeAttachmentFile.store.id.eq(storeId), storeAttachmentFile.isThumbnail.isTrue())
-//                .fetchFirst();
-//
-//        Store store1 = storeEntity.toBuilder().thumbnail()
-
-//        Store store1 = storeEntity.toBuilder().thumbnailId(thumbnailId).build();
-        log.info("==== Fin ====");
-
-
-        Store store1 = jpaQueryFactory.select(store)
+        // 기본 정보 + 썸네일
+        Store entity = jpaQueryFactory.select(store)
                 .from(store)
-                .fetchFirst();
+                .leftJoin(store.thumbnail, storeAttachmentFile).fetchJoin()
+                .where(store.isDel.isFalse(), store.id.eq(storeId))
+                .fetchOne();
 
+        if (entity != null) {
+            // 상세 이미지 리턴
+            List<StoreAttachmentFile> detailImages = jpaQueryFactory.select(storeAttachmentFile)
+                    .from(storeAttachmentFile)
+                    .where(storeAttachmentFile.store.id.eq(storeId), storeAttachmentFile.isDel.isFalse())
+                    .fetch();
+            entity.setDetailImages(detailImages);
+        }
 
-        return store1;
+        return entity;
     }
 
 
     @Override
     public void deleteById(Long storeId) {
         log.info("[StoreRepositoryImpl:deleteById] 게시글 삭제 처리 ");
+
         store = new QStore("s");
+        storeAttachmentFile = new QStoreAttachmentFile("saf");
+
 
         jpaQueryFactory
                 .update(store)
@@ -201,7 +185,6 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
                 .where(store.id.eq(storeId))
                 .execute();
 
-        QStoreAttachmentFile storeAttachmentFile = new QStoreAttachmentFile("sa");
         jpaQueryFactory
                 .update(storeAttachmentFile)
                 .set(storeAttachmentFile.isDel, true)

@@ -1,18 +1,12 @@
 package com.example.deliveryadmin.domain.member.repository;
 
-import com.example.deliveryadmin.domain.member.Member;
-import com.example.deliveryadmin.domain.member.QMember;
-import com.querydsl.core.types.Projections;
+import com.example.deliverycore.entity.Member;
+import com.example.deliverycore.entity.QMember;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
-import javax.swing.text.html.Option;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Optional;
 
-// RepositoryCustom interface 에 선언한 메소드 구현하는 파일
 @RequiredArgsConstructor
 public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;

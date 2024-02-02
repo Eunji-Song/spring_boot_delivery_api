@@ -13,7 +13,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        log.info("WEBCONFIG");
         registry.addConverter(new StoreCategoryConverter());
         registry.addConverter(new StoreStatusConverter());
     }

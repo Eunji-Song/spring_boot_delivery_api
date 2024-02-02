@@ -1,6 +1,6 @@
 package com.example.deliveryadmin.domain.auth;
 
-import com.example.deliveryadmin.domain.member.Member;
+import com.example.deliverycore.entity.Member;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

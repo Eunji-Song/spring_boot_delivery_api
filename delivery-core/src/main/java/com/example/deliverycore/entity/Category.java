@@ -1,4 +1,4 @@
-package com.example.deliveryadmin.domain.category;
+package com.example.deliverycore.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

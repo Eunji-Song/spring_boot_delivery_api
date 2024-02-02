@@ -1,16 +1,11 @@
-package com.example.deliveryadmin.domain.product;
+package com.example.deliverycore.entity;
 
-import com.example.deliveryadmin.common.entity.BaseEntity;
-import com.example.deliveryadmin.common.enums.ProductCategory;
-import com.example.deliveryadmin.common.fileupload.product.ProductAttachmentFile;
-import com.example.deliveryadmin.domain.member.Member;
-import com.example.deliveryadmin.domain.store.Store;
-import jakarta.annotation.Nullable;
+import com.example.deliverycore.entity.attachmentfile.ProductAttachmentFile;
+import com.example.deliverycore.enums.ProductCategory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DialectOverride;
 import org.hibernate.annotations.Where;
 
 import java.io.Serializable;
@@ -55,7 +50,6 @@ public class Product extends BaseEntity implements Serializable {
     private Store store;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinColumn(name = "thumbnail_id", nullable = true)
     @JoinColumn(name = "thumbnail_id", referencedColumnName = "product_attachment_file_id", nullable = true)
     private ProductAttachmentFile thumbnail = null;
 

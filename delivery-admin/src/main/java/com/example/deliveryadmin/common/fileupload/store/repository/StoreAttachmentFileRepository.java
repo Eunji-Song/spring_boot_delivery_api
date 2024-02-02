@@ -1,6 +1,7 @@
 package com.example.deliveryadmin.common.fileupload.store.repository;
 
-import com.example.deliveryadmin.common.fileupload.store.StoreAttachmentFile;
+
+import com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

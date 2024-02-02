@@ -1,17 +1,15 @@
 package com.example.deliveryadmin.domain.product;
 
-import com.example.deliveryadmin.common.enums.ProductCategory;
-import com.example.deliveryadmin.common.fileupload.product.ProductAttachmentFile;
-import com.example.deliveryadmin.common.fileupload.product.ProductAttachmentFileDto;
-import com.example.deliveryadmin.domain.member.Member;
-import com.example.deliveryadmin.domain.store.Store;
+import com.example.deliverycore.enums.ProductCategory;
+import com.example.deliverycore.entity.attachmentfile.ProductAttachmentFile;
+import com.example.deliveryadmin.common.fileupload.dto.ProductAttachmentFileDto;
+import com.example.deliverycore.entity.Member;
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.validator.constraints.Range;
 
 public class ProductDto {
     // === Request(역직렬화) === //
@@ -102,14 +100,18 @@ public class ProductDto {
 
         private ProductAttachmentFile thumbnail;
 
+        @NotNull(message = "매장 정보를 입력해주세요.")
+        private Long storeId;
+
         @Builder(toBuilder = true)
-        public RequestUpdate(ProductCategory category, String name, String description, int price, boolean isBest, ProductAttachmentFile thumbnail) {
+        public RequestUpdate(ProductCategory category, String name, String description, int price, Boolean isBest, ProductAttachmentFile thumbnail, Long storeId) {
             this.category = category;
             this.name = name;
             this.description = description;
             this.price = price;
             this.isBest = isBest;
             this.thumbnail = thumbnail;
+            this.storeId = storeId;
         }
 
 
@@ -131,7 +133,7 @@ public class ProductDto {
         private Long id;
         private String name;
         private String description;
-        private ProductAttachmentFileDto thumbnail;
+        private ProductAttachmentFileDto thumbnail = null;
         private boolean isBest;
 
         @QueryProjection
@@ -139,8 +141,7 @@ public class ProductDto {
             this.id = id;
             this.name = name;
             this.description = description;
-//            this.thumbnail = new ProductAttachmentFileDto(thumbnail);
-            this.thumbnail = null;
+            this.thumbnail = thumbnail != null ? new ProductAttachmentFileDto(thumbnail) : null;
             this.isBest = isBest;
         }
     }
@@ -148,8 +149,27 @@ public class ProductDto {
     /**
      * 메뉴 상세 조회
      */
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class DetailInfo {
+        private Long id;
+        private ProductCategory category;
+        private String name;
+        private String description;
+        private int price;
+        private ProductAttachmentFileDto thumbnail = null;
+        private boolean isBest;
 
+        @QueryProjection
+        public DetailInfo(Long id, ProductCategory category, String name, String description, int price, ProductAttachmentFile thumbnail, boolean isBest) {
+            this.id = id;
+            this.category = category;
+            this.name = name;
+            this.description = description;
+            this.price = price;
+            this.thumbnail = thumbnail != null ? new ProductAttachmentFileDto(thumbnail) : null;
+            this.isBest = isBest;
+        }
     }
 
 
