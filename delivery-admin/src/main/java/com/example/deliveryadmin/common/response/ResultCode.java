@@ -30,11 +30,14 @@ public enum ResultCode {
     UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, 415, "지원되지 않는 미디어 타입입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500, "서버 내부 오류가 발생했습니다."),
     SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, 503, "현재 서비스 이용이 불가능한 상태입니다."),
-    UNPROCESSABLE_ENTITY(HttpStatus.UNPROCESSABLE_ENTITY, 422, "처리할 수 없는 엔터티입니다.");
+    UNPROCESSABLE_ENTITY(HttpStatus.UNPROCESSABLE_ENTITY, 422, "처리할 수 없는 엔터티입니다."),
 
 
 
+    // store
 
+    // product
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, 404, "매장을 찾을 수 없습니다. ");
 
     private final HttpStatus httpStatus;
     private final Integer code;
