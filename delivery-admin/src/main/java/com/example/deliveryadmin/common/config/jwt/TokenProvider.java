@@ -2,7 +2,7 @@ package com.example.deliveryadmin.common.config.jwt;
 
 import com.example.deliveryadmin.common.exception.NotFoundException;
 import com.example.deliveryadmin.domain.auth.service.AuthDetailService;
-import com.example.deliveryadmin.domain.member.Member;
+import com.example.deliverycore.entity.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

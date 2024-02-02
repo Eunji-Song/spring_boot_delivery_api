@@ -1,7 +1,7 @@
 package com.example.deliveryadmin.domain.auth.service;
 
 import com.example.deliveryadmin.domain.auth.repository.AuthRepository;
-import com.example.deliveryadmin.domain.member.Member;
+import com.example.deliverycore.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

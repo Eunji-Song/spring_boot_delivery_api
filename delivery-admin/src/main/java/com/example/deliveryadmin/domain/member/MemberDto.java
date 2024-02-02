@@ -1,7 +1,6 @@
 package com.example.deliveryadmin.domain.member;
 
-import com.example.deliveryadmin.common.entity.BaseEntity;
-import com.example.deliveryadmin.domain.member.Member;
+import com.example.deliverycore.entity.Member;
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,6 +13,7 @@ public class MemberDto {
     /**
      * 회원가입
      */
+    @ToString
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class RequestJoinDto {

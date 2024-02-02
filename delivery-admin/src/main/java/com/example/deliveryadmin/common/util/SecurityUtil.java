@@ -1,11 +1,6 @@
 package com.example.deliveryadmin.common.util;
 
-import com.example.deliveryadmin.common.exception.NotFoundException;
-import com.example.deliveryadmin.common.exception.member.MemberNotFoundException;
-import com.example.deliveryadmin.common.response.ResultCode;
-import com.example.deliveryadmin.domain.member.Member;
-import com.example.deliveryadmin.domain.member.MemberDto;
-import com.example.deliveryadmin.domain.member.repository.MemberRepository;
+import com.example.deliverycore.entity.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

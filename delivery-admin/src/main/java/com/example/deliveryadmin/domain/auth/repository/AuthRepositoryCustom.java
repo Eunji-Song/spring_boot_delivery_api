@@ -1,13 +1,7 @@
 package com.example.deliveryadmin.domain.auth.repository;
 
-import com.example.deliveryadmin.domain.auth.AuthDto;
-import com.example.deliveryadmin.domain.member.Member;
-import com.example.deliveryadmin.domain.member.MemberDto;
-
-import java.util.Optional;
+import com.example.deliverycore.entity.Member;
 
 public interface AuthRepositoryCustom  {
-    boolean isExistsMember(String accountId, String password);
-
     Member findOneByAccountId(String accountId);
 }

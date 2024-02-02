@@ -1,7 +1,7 @@
 package com.example.deliveryadmin.common.fileupload;
 
 import com.example.deliveryadmin.common.exception.fileupload.InvalidFileException;
-import com.example.deliveryadmin.common.fileupload.attachment.AttachmentFile;
+import com.example.deliverycore.embeded.AttachmentFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

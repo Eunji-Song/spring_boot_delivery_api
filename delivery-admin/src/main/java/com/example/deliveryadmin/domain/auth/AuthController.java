@@ -42,38 +42,4 @@ public class AuthController {
     public void reissue() {
 
     }
-
-
-//
-//    /**
-//     * 토큰으로 유저 정보 확인
-//     */
-//    @GetMapping("/check")
-//    public ApiResult check(@AuthenticationPrincipal UserDetails userDetails) {
-//        String accountId = userDetails.getUsername();
-//        return ApiResponse.success(ResultCode.SUCCESS, authService.getUserInfo(accountId));
-//    }
-//
-//    /**
-//     * 토큰 재발급
-//     */
-//    @PutMapping("/reissue")
-//    public void reissue(HttpServletRequest request,
-//                        HttpServletResponse response) {
-//        log.info("reissue");
-//
-//        String accessToken = request.getHeader("Access-token");
-//        String refreshToken = request.getHeader("Refresh-token");
-//
-//        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-//        Authentication authentication = tokenProvider.getAuthentication(bearerToken);
-//
-//
-//        // 인증 정보 get
-//
-//        // refresh Token 생성
-//
-//
-//    }
-
 }

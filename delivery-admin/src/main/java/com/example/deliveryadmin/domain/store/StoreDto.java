@@ -1,15 +1,15 @@
 package com.example.deliveryadmin.domain.store;
 
-import com.example.deliveryadmin.common.embeded.Address;
-import com.example.deliveryadmin.common.embeded.OpeningHours;
-import com.example.deliveryadmin.common.enums.StoreCategory;
-import com.example.deliveryadmin.common.enums.StoreStatus;
-import com.example.deliveryadmin.common.fileupload.store.StoreAttachmentFile;
-import com.example.deliveryadmin.common.fileupload.store.StoreAttachmentFileDto;
-import com.example.deliveryadmin.domain.member.Member;
+import com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile;
+import com.example.deliverycore.enums.StoreCategory;
+import com.example.deliverycore.embeded.Address;
+import com.example.deliverycore.embeded.OpeningHours;
+import com.example.deliverycore.enums.StoreStatus;
+import com.example.deliveryadmin.common.fileupload.dto.StoreAttachmentFileDto;
+import com.example.deliverycore.entity.Member;
 import com.example.deliveryadmin.domain.member.MemberDto;
+import com.example.deliverycore.entity.Store;
 import com.querydsl.core.annotations.QueryProjection;
-import jakarta.persistence.Convert;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -17,7 +17,6 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class StoreDto {
     // === Request(역직렬화) === //
@@ -127,7 +126,7 @@ public class StoreDto {
     // === Response(직렬화) === //
 
     @Getter
-    @ToString
+    @NoArgsConstructor
     public static class DetailInfo {
         private Long id;
 
@@ -150,11 +149,8 @@ public class StoreDto {
         private List<StoreAttachmentFileDto.DetailImages> detailImages = new ArrayList<>();
 
 
-        public DetailInfo() {
-        }
-
         @QueryProjection
-        public DetailInfo(Store store, Member member) {
+        public DetailInfo(Store store) {
             // store
             this.id = store.getId();
             this.name = store.getName();
@@ -163,20 +159,11 @@ public class StoreDto {
             this.openingHours = store.getOpeningHours();
             this.category = store.getCategory();
             this.status = store.getStatus();
-
-            // member
-            this.member = new MemberDto.DetailInfo(member);
-
-            // 썸네일
-//            this.thumbnail = new StoreAttachmentFileDto.Thumbnail(store.getThumbnail());
-//
-//            // 상세 이미지
-//            List<StoreAttachmentFileDto.DetailImages> detailImagesList = new ArrayList<>();
-//            detailImagesList = store.getDetailImages().stream().map(StoreAttachmentFileDto.DetailImages::new).collect(Collectors.toList());
-//            this.detailImages = detailImagesList;
+            this.member = new MemberDto.DetailInfo(store.getMember());
+            this.thumbnail = new StoreAttachmentFileDto.Thumbnail(store.getThumbnail());
         }
 
-        public DetailInfo(StoreDto.DetailInfo detailInfo, StoreAttachmentFileDto.Thumbnail thumbnail, List<StoreAttachmentFileDto.DetailImages> detailImages) {
+        public DetailInfo(StoreDto.DetailInfo detailInfo, List<StoreAttachmentFileDto.DetailImages> detailImages) {
             // store
             this.id = detailInfo.getId();
             this.name = detailInfo.getName();
@@ -185,11 +172,8 @@ public class StoreDto {
             this.openingHours = detailInfo.getOpeningHours();
             this.category = detailInfo.getCategory();
             this.status = detailInfo.getStatus();
-
-            // member
             this.member = detailInfo.getMember();
-
-            this.thumbnail = thumbnail;
+            this.thumbnail = detailInfo.getThumbnail();
             this.detailImages = detailImages;
 
         }
