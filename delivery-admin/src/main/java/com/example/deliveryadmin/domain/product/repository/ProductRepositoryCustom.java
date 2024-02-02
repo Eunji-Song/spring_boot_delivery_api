@@ -20,8 +20,10 @@ public interface ProductRepositoryCustom {
      */
     List<ProductDto.ListData> getAllProducts(Long storeId);
 
+
     /**
-     * 매장에 등록된 메뉴 상세 데이터
+     * 매장 내 메뉴 상세 정보
      */
-    ProductDto.DetailInfo getProduct(Long productId);
+    ProductDto.DetailInfo getProductByIdAndStore(Long storeId, Long productId);
+
 }

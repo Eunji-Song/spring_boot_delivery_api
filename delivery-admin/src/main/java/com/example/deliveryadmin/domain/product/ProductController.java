@@ -29,8 +29,8 @@ public class ProductController {
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "메뉴 신규 등록")
     public ApiResult save(@RequestPart(name = "request") @Valid ProductDto.RequestSave requestSave
-                        , @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail) {
-        Long productId = productService.save(requestSave, thumbnail);
+                        , @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnailFile) {
+        Long productId = productService.save(requestSave, thumbnailFile);
 
         return ApiResponse.success(productId);
     }
@@ -41,8 +41,8 @@ public class ProductController {
     @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResult update(@PathVariable Long productId
                         , @RequestPart(name = "request") @Valid ProductDto.RequestUpdate requestUpdate
-                        , @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnail) {
-        productService.update(productId, requestUpdate, thumbnail);
+                        , @RequestPart(name = "thumbnail", required = false) MultipartFile thumbnailFile) {
+        productService.update(productId, requestUpdate, thumbnailFile);
         return ApiResponse.success();
     }
 
