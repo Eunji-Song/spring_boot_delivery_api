@@ -1,5 +1,6 @@
 package com.example.deliveryadmin.domain.store.repository;
 
+import com.example.deliveryadmin.common.fileupload.dto.QStoreAttachmentFileDto_DetailImages;
 import com.example.deliveryadmin.common.fileupload.dto.StoreAttachmentFileDto;
 import com.example.deliverycore.entity.QMember;
 import com.example.deliverycore.entity.QStore;
@@ -8,7 +9,6 @@ import com.example.deliverycore.entity.attachmentfile.QStoreAttachmentFile;
 import com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile;
 import com.example.deliverycore.enums.StoreCategory;
 import com.example.deliverycore.enums.StoreStatus;
-import com.example.deliveryadmin.common.fileupload.store.*;
 import com.example.deliveryadmin.domain.store.*;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
@@ -135,7 +135,7 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
         if (detailInfo != null) {
             detailImages = jpaQueryFactory.select(new QStoreAttachmentFileDto_DetailImages(storeAttachmentFile))
                     .from(storeAttachmentFile)
-                    .where(storeAttachmentFile.store.id.eq(storeId), storeAttachmentFile.isDel.isFalse())
+                    .where(storeAttachmentFile.store.id.eq(storeId), storeAttachmentFile.isDel.isFalse(), storeAttachmentFile.isDetailImage.isTrue())
                     .fetch();
         }
 
@@ -162,7 +162,7 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
             // 상세 이미지 리턴
             List<StoreAttachmentFile> detailImages = jpaQueryFactory.select(storeAttachmentFile)
                     .from(storeAttachmentFile)
-                    .where(storeAttachmentFile.store.id.eq(storeId), storeAttachmentFile.isDel.isFalse())
+                    .where(storeAttachmentFile.store.id.eq(storeId), storeAttachmentFile.isDel.isFalse(), storeAttachmentFile.isDetailImage.isTrue())
                     .fetch();
             entity.setDetailImages(detailImages);
         }

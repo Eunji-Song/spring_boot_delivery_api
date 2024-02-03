@@ -1,12 +1,8 @@
 package com.example.deliveryadmin.domain.product;
 
 import com.example.deliveryadmin.common.exception.NotFoundException;
-import com.example.deliveryadmin.common.exception.fileupload.FileUploadException;
-import com.example.deliveryadmin.common.exception.fileupload.MultipartDataNotValidException;
-import com.example.deliveryadmin.common.fileupload.FileUpload;
 import com.example.deliveryadmin.common.fileupload.service.ProductAttachmentServiceImpl;
 import com.example.deliveryadmin.common.util.SecurityUtil;
-import com.example.deliverycore.embeded.AttachmentFile;
 import com.example.deliverycore.entity.Member;
 import com.example.deliveryadmin.domain.product.repository.ProductRepository;
 import com.example.deliverycore.entity.Product;
@@ -62,7 +58,7 @@ public class ProductService {
         // 썸네일
         ProductAttachmentFile thumbnail = null;
         if (thumbnailFile != null && thumbnailFile.getSize() > 0) {
-            thumbnail = productAttachmentService.uploadThumbnail(thumbnailFile);
+            thumbnail = productAttachmentService.uploadFile(thumbnailFile, true, product);
             thumbnail.setProduct(product);
             product.setThumbnail(thumbnail);
         }
@@ -103,8 +99,7 @@ public class ProductService {
         // 신규 썸네일 이미지 등록
         ProductAttachmentFile thumbnail = null;
         if (thumbnailFile != null && thumbnailFile.getSize() > 0) {
-            thumbnail = productAttachmentService.uploadThumbnail(thumbnailFile);
-            thumbnail.setProduct(product);
+            thumbnail = productAttachmentService.uploadFile(thumbnailFile, true, product);
             product.setThumbnail(thumbnail);
         }
 

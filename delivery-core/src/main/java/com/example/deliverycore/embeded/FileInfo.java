@@ -1,27 +1,39 @@
 package com.example.deliverycore.embeded;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.util.Objects;
 
 @Getter
 @Embeddable
-public class AttachmentFile {
+public class FileInfo {
+    @Column(nullable = false)
+    @NotNull
     private String originFileName;
 
+    @Column(nullable = false)
+    @NotNull
     private String fileName;
 
+    @Column(nullable = false)
+    @NotNull
     private String filePath;
 
+    @Column(nullable = false)
+    @NotNull
     private String fileType;
 
+    @Column(nullable = false)
+    @NotNull
     private Long fileSize;
 
-    public AttachmentFile() {
+    public FileInfo() {
     }
 
-    public AttachmentFile(String originFileName, String fileName, String filePath, String fileType, Long fileSize) {
+    public FileInfo(String originFileName, String fileName, String filePath, String fileType, Long fileSize) {
         this.originFileName = originFileName;
         this.fileName = fileName;
         this.filePath = filePath;
@@ -33,7 +45,7 @@ public class AttachmentFile {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AttachmentFile that = (AttachmentFile) o;
+        FileInfo that = (FileInfo) o;
         return Objects.equals(originFileName, that.originFileName) && Objects.equals(fileName, that.fileName) && Objects.equals(filePath, that.filePath) && Objects.equals(fileType, that.fileType) && Objects.equals(fileSize, that.fileSize);
     }
 

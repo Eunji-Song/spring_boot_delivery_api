@@ -1,14 +1,13 @@
 package com.example.deliverycore.entity.attachmentfile;
 
 
-import com.example.deliverycore.embeded.AttachmentFile;
+import com.example.deliverycore.embeded.FileInfo;
 import com.example.deliverycore.entity.BaseEntity;
 import com.example.deliverycore.entity.Store;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 
@@ -38,76 +37,43 @@ public class StoreAttachmentFile extends BaseEntity {
     @Column(name = "is_detail_image", nullable = false)
     private boolean isDetailImage;
 
-    @Column(nullable = false)
-    private String originFileName;
+    @Embedded
+    FileInfo fileInfo;
 
-    @Column(nullable = false)
-    private String fileName;
-
-    @Column(nullable = false)
-    private String filePath;
-
-    @Column(nullable = false)
-    private String fileType;
-
-    @Column(nullable = false)
-    private Long fileSize;
-
+    @JsonIgnore
     @ColumnDefault(value = "false")
     private boolean isDel = false;
 
     public StoreAttachmentFile() {
     }
 
-    public StoreAttachmentFile(String originFileName, String fileName, String filePath, String fileType, Long fileSize) {
-        this.originFileName = originFileName;
-        this.fileName = fileName;
-        this.filePath = filePath;
-        this.fileType = fileType;
-        this.fileSize = fileSize;
-    }
-
-
-    @Builder
-    public StoreAttachmentFile(Long id, Store store, boolean isThumbnail, boolean isDetailImage, String originFileName, String fileName, String filePath, String fileType, Long fileSize, boolean isDel) {
+    @Builder(toBuilder = true)
+    public StoreAttachmentFile(Long id, Store store, boolean isThumbnail, boolean isDetailImage, FileInfo fileInfo, boolean isDel) {
         this.id = id;
         this.store = store;
         this.isThumbnail = isThumbnail;
         this.isDetailImage = isDetailImage;
-        this.originFileName = originFileName;
-        this.fileName = fileName;
-        this.filePath = filePath;
-        this.fileType = fileType;
-        this.fileSize = fileSize;
+        this.fileInfo = fileInfo;
         this.isDel = isDel;
     }
 
-    // 모든 매개변수를 가지고 있는 생성자
-    @Builder
-    public StoreAttachmentFile(Store store, boolean isThumbnail, AttachmentFile attachmentFile) {
-        this.store = store;
+    public StoreAttachmentFile(FileInfo fileInfo, boolean isThumbnail) {
+        this.fileInfo = fileInfo;
         this.isThumbnail = isThumbnail;
         this.isDetailImage = !isThumbnail;
-        this.originFileName = attachmentFile.getOriginFileName();
-        this.fileName = attachmentFile.getFileName();
-        this.filePath = attachmentFile.getFilePath();
-        this.fileType = attachmentFile.getFileType();
-        this.fileSize = attachmentFile.getFileSize();
     }
 
-    public StoreAttachmentFile(AttachmentFile attachmentFile, boolean isThumbnail) {
-        this.originFileName = attachmentFile.getOriginFileName();
-        this.fileName = attachmentFile.getFileName();
-        this.filePath = attachmentFile.getFilePath();
-        this.fileType = attachmentFile.getFileType();
-        this.fileSize = attachmentFile.getFileSize();
+    public StoreAttachmentFile(Store store, boolean isThumbnail, FileInfo fileInfo) {
+        this.store = store;
         this.isThumbnail = isThumbnail;
+        this.fileInfo = fileInfo;
     }
 
+    public void setStore(Store store) {
+        this.store = store;
+    }
 
     public void setDel(boolean del) {
         isDel = del;
     }
-
-
 }

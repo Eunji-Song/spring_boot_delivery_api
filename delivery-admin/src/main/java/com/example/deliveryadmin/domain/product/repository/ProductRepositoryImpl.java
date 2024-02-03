@@ -69,10 +69,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 .fetchOne();
 
 
-        if (detailInfo == null) {
-            throw new NotFoundException(ResultCode.PRODUCT_NOT_FOUND.getMessage());
-        }
-
         return detailInfo;
 
     }
