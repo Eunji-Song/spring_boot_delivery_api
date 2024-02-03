@@ -2,6 +2,7 @@ package com.example.deliveryadmin.domain.store;
 
 import com.example.deliveryadmin.common.exception.fileupload.FileUploadException;
 import com.example.deliveryadmin.common.fileupload.*;
+import com.example.deliveryadmin.common.fileupload.service.StoreAttachmentServiceImpl;
 import com.example.deliveryadmin.common.fileupload.store.StoreAttachmentFileService;
 import com.example.deliveryadmin.common.util.SecurityUtil;
 import com.example.deliveryadmin.domain.product.ProductDto;
@@ -14,7 +15,7 @@ import com.example.deliverycore.enums.StoreStatus;
 import com.example.deliverycore.entity.Member;
 import com.example.deliverycore.entity.Store;
 import com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile;
-import com.example.deliverycore.embeded.AttachmentFile;
+import com.example.deliverycore.embeded.FileInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,9 +34,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreValidate storeValidate; // 매장 유효성 검사
     private final FileUpload fileUpload;
-    private final StoreAttachmentFileService storeAttachmentFileService;
-
-
+    private final StoreAttachmentServiceImpl storeAttachmentFileService;
 
     /**
      * 매장 목록 전체 조회
@@ -65,13 +64,13 @@ public class StoreService {
      * 매장 신규 등록
      *
      * @param requestSaveDto : 매장 정보에 대한 입력값
-     * @param thumbnail      : 썸네일 이미지, 하나만 등록 가능
+     * @param thumbnailFile      : 썸네일 이미지, 하나만 등록 가능
      * @param detailImages   : 상세 페이지, 여러개 등록 가능
      * @return : storeId
      */
     @Transactional
     public Long save(StoreDto.RequestSaveDto requestSaveDto
-                    , MultipartFile thumbnail
+                    , MultipartFile thumbnailFile
                     , MultipartFile[] detailImages) {
         log.info("[StoreService:save] 매장 정보 저장 요청 dto : {} ", requestSaveDto.toString());
 
@@ -91,14 +90,14 @@ public class StoreService {
         Store store = storeMapper.saveDtoToEntity(requestSaveDto);
 
         // 썸네일 생성
-        if (thumbnail != null && thumbnail.getSize() > 0) {
-            StoreAttachmentFile thumbnailInfo = getOneAttachmentFileInfo(store, thumbnail, true);
-            store.setThumbnail(thumbnailInfo);
+        if (thumbnailFile != null && thumbnailFile.getSize() > 0) {
+            StoreAttachmentFile thumbnail = storeAttachmentFileService.uploadFile(thumbnailFile, true, store);
+            store.setThumbnail(thumbnail);
         }
 
         // 상세 이미지 생성
         if (detailImages != null && detailImages.length > 0) {
-            List<StoreAttachmentFile> detailImageList = getMultiAttachmentFileInfo(store, detailImages, false);
+            List<StoreAttachmentFile> detailImageList = storeAttachmentFileService.uploadMultiFile(detailImages, false, store);
             store.setDetailImages(detailImageList);
         }
 
@@ -113,12 +112,11 @@ public class StoreService {
      */
     @Transactional
     public void update(Long storeId, StoreDto.RequestUpdateDto requestUpdateDto
-                        , MultipartFile thumbnail
+                        , MultipartFile thumbnailFile
                         , MultipartFile[] detailImages
                         , List<Integer> deleteFilesIdList) {
         log.info("[StoreService:update] 매장 정보 수정 요청 dto : {} ", requestUpdateDto.toString());
 
-        log.info("store : {}", storeId);
 
         Store store = storeRepository.findOneByIdToEntity(storeId);
         storeValidate.isEmptyData(storeId, store);
@@ -132,26 +130,31 @@ public class StoreService {
 
 
         // ==== 썸네일 신규 등록 및 수정 ==== //
+
         // 썸네일 생성
-        if (thumbnail != null && thumbnail.getSize() > 0) {
+        if (thumbnailFile != null && thumbnailFile.getSize() > 0) {
+            // 기존 썸네일 삭제 처리
             if (store.getThumbnail() != null) {
-                storeAttachmentFileService.deleteFileById(store.getThumbnail().getId());
+                store.getThumbnail().setDel(true);
             }
 
-            StoreAttachmentFile thumbnailInfo = getOneAttachmentFileInfo(store, thumbnail, true);
-            store.setThumbnail(thumbnailInfo);
-        }
+            // 신규 썸네일 등록
+            StoreAttachmentFile thumbnail = storeAttachmentFileService.uploadFile(thumbnailFile, true, store);
+            store.setThumbnail(thumbnail);
 
-        // 상세 이미지 생성
-        if (detailImages != null && detailImages.length > 0) {
-            List<StoreAttachmentFile> detailImageList = getMultiAttachmentFileInfo(store, detailImages, false);
-            store.setDetailImages(detailImageList);
         }
 
         // 기존 상세 이미지 삭제
         if (deleteFilesIdList != null && deleteFilesIdList.size() > 0) {
-            storeAttachmentFileService.deleteFilesByIdList(deleteFilesIdList);
+            storeAttachmentFileService.deleteFiles(deleteFilesIdList);
         }
+
+        // 상세 이미지 생성
+        if (detailImages != null && detailImages.length > 0) {
+            List<StoreAttachmentFile> detailImageList = storeAttachmentFileService.uploadMultiFile(detailImages, false, store);
+            store.setDetailImages(detailImageList);
+        }
+
 
         // 데이터 수정
         Store updateEntity = store.toBuilder()
@@ -165,79 +168,6 @@ public class StoreService {
 
 
     }
-
-
-
-    /**
-     * 파일 업로드 처리
-     *
-     * @param file        업로드할 파일
-     * @param store       매장 정보
-     * @param isThumbnail 썸네일 여부
-     */
-    private void uploadFile(MultipartFile file, Store store, boolean isThumbnail) {
-        if (file != null && file.getSize() > 0) {
-            try {
-                log.info("[StoreService:uploadFile] 파일 업로드 시작 ");
-
-                // 파일 업로드 후 AttachmentFile 생성 및 저장
-                AttachmentFile attachmentFile = fileUpload.uploadFile(file);
-//                attachmentFileService.saveInfo(attachmentFile);
-
-                // StoreAttachmentFile 생성 및 저장
-                StoreAttachmentFile storeAttachmentFile = StoreAttachmentFile.builder()
-                        .store(store)
-//                        .attachmentFile(attachmentFile)
-                        .isThumbnail(isThumbnail)
-                        .isDetailImage(!isThumbnail) // 썸네일이 아니면 상세 이미지
-                        .fileName(attachmentFile.getFileName())
-                        .filePath(attachmentFile.getFilePath())
-                        .fileType(attachmentFile.getFileType())
-                        .build();
-                storeAttachmentFileService.saveInfo(storeAttachmentFile);
-            } catch (Exception e) {
-                log.error("[StoreService:uploadFile] 파일 업로드 중 오류 발생: isthumbnail : {} {}", isThumbnail, e.getMessage());
-                throw new FileUploadException("파일 업로드 중 오류가 발생했습니다.");
-            }
-        }
-    }
-
-    private StoreAttachmentFile getOneAttachmentFileInfo(Store store, MultipartFile file, boolean isThumbnail) {
-        StoreAttachmentFile storeAttachmentFile = null;
-        try {
-            log.info("[StoreService:uploadFile] 파일 업로드 시작 ");
-
-            // 파일 업로드 후 AttachmentFile 생성 및 저장
-            AttachmentFile attachmentFile = fileUpload.uploadFile(file);
-
-            // StoreAttachmentFile 생성 및 저장
-            storeAttachmentFile = new StoreAttachmentFile(store, isThumbnail, attachmentFile);
-        } catch (Exception e) {
-            log.error("[StoreService:uploadFile] 파일 업로드 중 오류 발생: isthumbnail : {} {}", isThumbnail, e.getMessage());
-            throw new FileUploadException("파일 업로드 중 오류가 발생했습니다.");
-        }
-
-        return storeAttachmentFile;
-    }
-
-    private List<StoreAttachmentFile> getMultiAttachmentFileInfo(Store store, MultipartFile[] detailImages, boolean isThumbnail) {
-        List<StoreAttachmentFile> list = new ArrayList<>();
-        try {
-            for (MultipartFile detailImage : detailImages) {
-                StoreAttachmentFile info = getOneAttachmentFileInfo(store, detailImage, isThumbnail);
-                list.add(info);
-            }
-        } catch (Exception e) {
-            log.error("[StoreService:uploadFile] 파일 업로드 중 오류 발생: isthumbnail : {} {}", isThumbnail, e.getMessage());
-            throw new FileUploadException("파일 업로드 중 오류가 발생했습니다.");
-        }
-
-        log.info("multi list : {}", list.toString());
-
-        return list;
-    }
-
-
 
 
     /**

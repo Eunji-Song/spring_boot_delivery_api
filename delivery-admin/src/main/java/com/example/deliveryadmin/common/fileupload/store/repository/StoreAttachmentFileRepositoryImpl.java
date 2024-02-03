@@ -15,17 +15,6 @@ public class StoreAttachmentFileRepositoryImpl implements StoreAttachmentFileRep
     private QStoreAttachmentFile storeAttachmentFile;
 
     @Override
-    public void deleteFileById(Long attachmentId) {
-        storeAttachmentFile = new QStoreAttachmentFile("s");
-
-        jpaQueryFactory
-                .update(storeAttachmentFile)
-                .set(storeAttachmentFile.isDel, true)
-                .where(storeAttachmentFile.id.eq(attachmentId))
-                .execute();
-    }
-
-    @Override
     public void deleteFilesByIdList(List<Integer>deleteFilesIdList) {
         int listSize = deleteFilesIdList.size();
         Integer arr[] = deleteFilesIdList.toArray(deleteFilesIdList.toArray(new Integer[listSize]));

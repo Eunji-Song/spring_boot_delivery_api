@@ -1,7 +1,7 @@
 package com.example.deliveryadmin.common.fileupload;
 
 import com.example.deliveryadmin.common.exception.fileupload.InvalidFileException;
-import com.example.deliverycore.embeded.AttachmentFile;
+import com.example.deliverycore.embeded.FileInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-public  class FileUpload {
+public class FileUpload {
     @Value("${file.dir}")
     private String uploadDir;
 
@@ -31,24 +31,23 @@ public  class FileUpload {
     }
 
     // == 다중 파일 처리 === //
-    public List<AttachmentFile> uploadFiles(MultipartFile[] files) throws Exception {
-        List<AttachmentFile> fileInfoList = new ArrayList<>();
+    public List<FileInfo> uploadFiles(MultipartFile[] files) throws Exception {
+        List<FileInfo> fileInfoList = new ArrayList<>();
         for (MultipartFile file : files) {
             fileInfoList.add(upload(file));
         }
         return fileInfoList;
     }
 
+
     // == 단일 파일 처리 === //
-    public AttachmentFile uploadFile(MultipartFile multipartFile) throws Exception {
-        AttachmentFile attachmentFile = upload(multipartFile);
-        return attachmentFile;
+    public FileInfo uploadFile(MultipartFile multipartFile) throws Exception {
+        FileInfo fileInfo = upload(multipartFile);
+        return fileInfo;
     }
 
-
-
     // == 파일 업로드 === //
-    private AttachmentFile upload(MultipartFile file) throws Exception {
+    private FileInfo upload(MultipartFile file) throws Exception {
         // 파일 유효성 검사
         isValidFile(file);
 
@@ -76,8 +75,8 @@ public  class FileUpload {
         String filePath = uploadPath + "/" + fileName;
         Long fileSize = file.getSize(); // byte
 
-        AttachmentFile attachmentFile = new AttachmentFile(originFileName, fileName, filePath, fileType, fileSize);
-        return attachmentFile;
+        FileInfo fileInfo = new FileInfo(originFileName, fileName, filePath, fileType, fileSize);
+        return fileInfo;
     }
 
 
