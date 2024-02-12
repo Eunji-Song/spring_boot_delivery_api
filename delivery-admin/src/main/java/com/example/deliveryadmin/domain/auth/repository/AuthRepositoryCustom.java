@@ -1,7 +1,7 @@
 package com.example.deliveryadmin.domain.auth.repository;
 
-import com.example.deliverycore.entity.Member;
+import com.example.deliverycore.entity.Admin;
 
 public interface AuthRepositoryCustom  {
-    Member findOneByAccountId(String accountId);
+    Admin findOneByAccountId(String accountId);
 }

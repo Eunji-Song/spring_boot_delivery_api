@@ -3,6 +3,7 @@ package com.example.deliveryadmin.domain.product;
 import com.example.deliveryadmin.common.exception.NotFoundException;
 import com.example.deliveryadmin.common.fileupload.service.ProductAttachmentServiceImpl;
 import com.example.deliveryadmin.common.util.SecurityUtil;
+import com.example.deliverycore.entity.Admin;
 import com.example.deliverycore.entity.Member;
 import com.example.deliveryadmin.domain.product.repository.ProductRepository;
 import com.example.deliverycore.entity.Product;
@@ -39,8 +40,7 @@ public class ProductService {
         log.info("[ProductService:save] 메뉴 정보 저장 요청 dto : {} ", requestSave.toString());
 
         // == 사용자 정보 할당 == //
-        Member member = SecurityUtil.getCurrentMemberInfo();
-        requestSave.setMember(member);
+        Admin admin = SecurityUtil.getCurrentAdminInfo();
 
         // == 메뉴 정보 유효성 검사 == //
         Long storeId = requestSave.getStoreId();

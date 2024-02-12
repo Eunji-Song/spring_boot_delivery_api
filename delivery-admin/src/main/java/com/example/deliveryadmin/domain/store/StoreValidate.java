@@ -86,7 +86,7 @@ public class StoreValidate {
      */
     private void validStoreNameDuplicated(String storeName, Long storeId) {
         // 사용자 id 추출
-        Long memberId = SecurityUtil.getCurrentMemberId();
+        Long memberId = SecurityUtil.getCurrentAdminId();
         boolean isExistStore = storeRepository.isExistStoreName(memberId, storeName, storeId);
         if (isExistStore) {
             throw new ConflictException("이미 같은 이름의 매장이 등록되어 있습니다.");

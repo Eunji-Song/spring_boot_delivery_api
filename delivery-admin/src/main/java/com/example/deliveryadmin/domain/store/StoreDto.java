@@ -1,13 +1,13 @@
 package com.example.deliveryadmin.domain.store;
 
+import com.example.deliveryadmin.domain.admin.AdminDto;
+import com.example.deliverycore.entity.Admin;
 import com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile;
 import com.example.deliverycore.enums.StoreCategory;
 import com.example.deliverycore.embeded.Address;
 import com.example.deliverycore.embeded.OpeningHours;
 import com.example.deliverycore.enums.StoreStatus;
 import com.example.deliveryadmin.common.fileupload.dto.StoreAttachmentFileDto;
-import com.example.deliverycore.entity.Member;
-import com.example.deliveryadmin.domain.member.MemberDto;
 import com.example.deliverycore.entity.Store;
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.validation.constraints.NotBlank;
@@ -53,7 +53,7 @@ public class StoreDto {
         @Size(max = 20)
         private String name;
 
-        private MemberDto.DetailInfo member;
+        private AdminDto.DetailInfo admin;
 
         private String description;
 
@@ -70,9 +70,9 @@ public class StoreDto {
         private StoreStatus status;
 
         @Builder
-        public RequestSaveDto(String name, MemberDto.DetailInfo member, String description, Address address, OpeningHours openingHours, StoreCategory category, StoreStatus status) {
+        public RequestSaveDto(String name, AdminDto.DetailInfo admin, String description, Address address, OpeningHours openingHours, StoreCategory category, StoreStatus status) {
             this.name = name;
-            this.member = member;
+            this.admin = admin;
             this.description = description;
             this.address = address;
             this.openingHours = openingHours;
@@ -82,8 +82,8 @@ public class StoreDto {
 
 
         // StoreService - save DTO에 사용자 정보 할당 할 때 사용
-        public void setMember(Member member) {
-            this.member = new MemberDto.DetailInfo(member);
+        public void setAdmin(Admin admin) {
+            this.admin = new AdminDto.DetailInfo(admin);
         }
 
     }
@@ -142,7 +142,7 @@ public class StoreDto {
 
         private StoreStatus status;
 
-        private MemberDto.DetailInfo member;
+        private AdminDto.DetailInfo admin;
 
         private StoreAttachmentFileDto.Thumbnail thumbnail;
 
@@ -159,7 +159,7 @@ public class StoreDto {
             this.openingHours = store.getOpeningHours();
             this.category = store.getCategory();
             this.status = store.getStatus();
-            this.member = new MemberDto.DetailInfo(store.getMember());
+            this.admin = new AdminDto.DetailInfo(store.getAdmin());
             this.thumbnail = new StoreAttachmentFileDto.Thumbnail(store.getThumbnail());
         }
 
@@ -172,7 +172,7 @@ public class StoreDto {
             this.openingHours = detailInfo.getOpeningHours();
             this.category = detailInfo.getCategory();
             this.status = detailInfo.getStatus();
-            this.member = detailInfo.getMember();
+            this.admin = detailInfo.getAdmin();
             this.thumbnail = detailInfo.getThumbnail();
             this.detailImages = detailImages;
 

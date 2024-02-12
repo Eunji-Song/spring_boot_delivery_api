@@ -33,10 +33,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             booleanBuilder.and(product.id.ne(productId));
         }
 
-        boolean isExist = jpaQueryFactory.select(product.id).from(product)
+        return jpaQueryFactory.select(product.id).from(product)
                 .where(booleanBuilder)
                 .fetchOne() != null;
-        return isExist;
     }
 
 
@@ -48,12 +47,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         product = new QProduct("p");
         productAttachmentFile = new QProductAttachmentFile("qaf");
 
-        List<ProductDto.ListData> list = jpaQueryFactory.select(new QProductDto_ListData(product.id, product.name, product.description, product.thumbnail, product.isBest))
+        return jpaQueryFactory.select(new QProductDto_ListData(product.id, product.name, product.description, product.thumbnail, product.isBest))
                 .from(product)
                 .leftJoin(product.thumbnail, productAttachmentFile)
                 .where(product.store.id.eq(storeId))
                 .fetch();
-        return list;
     }
 
 
@@ -62,14 +60,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         product = new QProduct("p");
         productAttachmentFile = new QProductAttachmentFile("qaf");
 
-        ProductDto.DetailInfo detailInfo = jpaQueryFactory.select(new QProductDto_DetailInfo(product.id, product.category, product.name, product.description, product.price, product.thumbnail, product.isBest))
+        return jpaQueryFactory.select(new QProductDto_DetailInfo(product.id, product.name, product.description, product.price, product.thumbnail, product.isBest))
                 .from(product)
                 .leftJoin(product.thumbnail, productAttachmentFile)
                 .where(product.store.id.eq(storeId), product.id.eq(productId))
                 .fetchOne();
-
-
-        return detailInfo;
 
     }
 }

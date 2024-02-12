@@ -1,5 +1,6 @@
 package com.example.deliveryadmin.domain.product;
 
+import com.example.deliverycore.entity.Admin;
 import com.example.deliverycore.enums.ProductCategory;
 import com.example.deliverycore.entity.attachmentfile.ProductAttachmentFile;
 import com.example.deliveryadmin.common.fileupload.dto.ProductAttachmentFileDto;
@@ -20,7 +21,6 @@ public class ProductDto {
     @Getter
     @NoArgsConstructor(access =  AccessLevel.PROTECTED)
     public static class RequestSearch {
-        private ProductCategory productCategory;
         private String name;
     }
 
@@ -32,8 +32,6 @@ public class ProductDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class RequestSave {
-        private ProductCategory category;
-
         @NotBlank(message = "메뉴명을 입력해 주세요.")
         private String name;
 
@@ -50,25 +48,18 @@ public class ProductDto {
         private Long storeId;
 
 
-        private Member member;
-
         private ProductAttachmentFile thumbnail;
 
         @Builder(toBuilder = true)
-        public RequestSave(ProductCategory category, String name, String description, int price, boolean isBest, Long storeId, Member member, ProductAttachmentFile thumbnail) {
-            this.category = category;
+        public RequestSave( String name, String description, int price, boolean isBest, Long storeId, ProductAttachmentFile thumbnail) {
             this.name = name;
             this.description = description;
             this.price = price;
             this.isBest = isBest;
             this.storeId = storeId;
-            this.member = member;
             this.thumbnail = thumbnail;
         }
 
-        public void setMember(Member member) {
-            this.member = member;
-        }
 
         public void setThumbnail(ProductAttachmentFile thumbnail) {
             this.thumbnail = thumbnail;
@@ -104,8 +95,7 @@ public class ProductDto {
         private Long storeId;
 
         @Builder(toBuilder = true)
-        public RequestUpdate(ProductCategory category, String name, String description, int price, Boolean isBest, ProductAttachmentFile thumbnail, Long storeId) {
-            this.category = category;
+        public RequestUpdate(String name, String description, int price, Boolean isBest, ProductAttachmentFile thumbnail, Long storeId) {
             this.name = name;
             this.description = description;
             this.price = price;
@@ -153,7 +143,6 @@ public class ProductDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class DetailInfo {
         private Long id;
-        private ProductCategory category;
         private String name;
         private String description;
         private int price;
@@ -161,9 +150,8 @@ public class ProductDto {
         private boolean isBest;
 
         @QueryProjection
-        public DetailInfo(Long id, ProductCategory category, String name, String description, int price, ProductAttachmentFile thumbnail, boolean isBest) {
+        public DetailInfo(Long id,  String name, String description, int price, ProductAttachmentFile thumbnail, boolean isBest) {
             this.id = id;
-            this.category = category;
             this.name = name;
             this.description = description;
             this.price = price;

@@ -10,7 +10,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DialectOverride;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 @Getter
 @Table(name = "store")
 @SQLDelete(sql = "UPDATE store SET is_del = 1 WHERE store_id = ?")
+@Where(clause = "is_del = 0")
 public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +32,7 @@ public class Store extends BaseEntity {
     // 소유주
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id",nullable = false, updatable = false)
-    private Member member;
+    private Admin admin;
 
     @Column(nullable = false)
     private String name;
@@ -52,6 +55,10 @@ public class Store extends BaseEntity {
     private OpeningHours openingHours;
 
     @Column(nullable = false)
+    @ColumnDefault(value = "0")
+    private int minOrderAmount;
+
+    @Column(nullable = false)
     @ColumnDefault("false")
     private boolean isDel;
 
@@ -67,9 +74,9 @@ public class Store extends BaseEntity {
     }
 
     @Builder(toBuilder = true)
-    public Store(Long id, Member member, String name, String description, StoreStatus status, StoreCategory category, Address address, OpeningHours openingHours, boolean isDel, StoreAttachmentFile thumbnail, List<StoreAttachmentFile> detailImages) {
+    public Store(Long id, Admin admin, String name, String description, StoreStatus status, StoreCategory category, Address address, OpeningHours openingHours, boolean isDel, StoreAttachmentFile thumbnail, List<StoreAttachmentFile> detailImages) {
         this.id = id;
-        this.member = member;
+        this.admin = admin;
         this.name = name;
         this.description = description;
         this.status = status;

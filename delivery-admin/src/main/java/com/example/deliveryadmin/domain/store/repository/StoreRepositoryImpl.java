@@ -92,7 +92,7 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
 
-        booleanBuilder.and(store.isDel.eq(false)).and(store.member.id.eq(adminId)).and(store.name.eq(name));
+        booleanBuilder.and(store.isDel.eq(false)).and(store.admin.id.eq(adminId)).and(store.name.eq(name));
 
         if (storeId != null) {
             booleanBuilder.and(store.id.ne(storeId));

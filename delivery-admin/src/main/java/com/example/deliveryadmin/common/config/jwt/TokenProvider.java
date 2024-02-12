@@ -2,7 +2,7 @@ package com.example.deliveryadmin.common.config.jwt;
 
 import com.example.deliveryadmin.common.exception.NotFoundException;
 import com.example.deliveryadmin.domain.auth.service.AuthDetailService;
-import com.example.deliverycore.entity.Member;
+import com.example.deliverycore.entity.Admin;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -78,7 +78,7 @@ public class TokenProvider implements InitializingBean {
      * @param expirationPeriodMs : 토큰 만료 기간
      */
     public String createToken(Authentication authentication, Long expirationPeriodMs) {
-        Member member = (Member) authentication.getPrincipal();
+        Admin admin = (Admin) authentication.getPrincipal();
 
         // 토큰 만료 기간 생성
         long now = (new Date()).getTime();
@@ -86,7 +86,7 @@ public class TokenProvider implements InitializingBean {
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim("admin_id", member.getId())
+                .claim("admin_id", admin.getId())
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
                 .compact();

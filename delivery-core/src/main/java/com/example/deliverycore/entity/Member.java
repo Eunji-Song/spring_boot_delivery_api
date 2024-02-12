@@ -10,14 +10,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
+/**
+ * 사용자 계정
+ */
+
 @Entity
-@Table(name = "admin")
+@Table(name = "member")
 @Getter
-@ToString(exclude = "stores")
 public class Member extends BaseEntity implements UserDetails  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "admin_id")
+    @Column(name = "member_id")
     private Long id;
 
     @Column(name = "account_id", nullable = false)
@@ -94,6 +97,9 @@ public class Member extends BaseEntity implements UserDetails  {
         this.withdrawalDate = withdrawalDate;
     }
 
+    public Member(Long id) {
+        this.id = id;
+    }
 
     // setter
 
