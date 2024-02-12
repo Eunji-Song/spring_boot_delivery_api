@@ -4,7 +4,7 @@ import com.example.deliveryadmin.common.config.jwt.TokenProvider;
 import com.example.deliveryadmin.common.exception.member.MemberNotFoundException;
 import com.example.deliveryadmin.domain.auth.AuthDto;
 import com.example.deliveryadmin.domain.auth.repository.AuthRepository;
-import com.example.deliverycore.entity.Member;
+import com.example.deliverycore.entity.Admin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,8 +31,8 @@ public class AuthService {
         String accountId = requestAuthenticate.getAccountId();
 
         // 회원 존재 여부 검사
-        Member member = authRepository.findOneByAccountId(accountId);
-        if (member == null) {
+        Admin admin = authRepository.findOneByAccountId(accountId);
+        if (admin == null) {
             throw new MemberNotFoundException();
         }
 

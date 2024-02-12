@@ -21,10 +21,6 @@ public class Product extends BaseEntity implements Serializable {
     @Column(name = "product_id")
     private Long id;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
-    ProductCategory category;
-
     @Column(nullable = false)
     private String name;
 
@@ -41,10 +37,6 @@ public class Product extends BaseEntity implements Serializable {
     @ColumnDefault(value = "false")
     boolean isDel;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id",nullable = false, updatable = false)
-    private Member member;
-
     @JoinColumn(name = "store_id", updatable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Store store;
@@ -55,23 +47,17 @@ public class Product extends BaseEntity implements Serializable {
 
 
     @Builder(toBuilder = true)
-    public Product(Long id, ProductCategory category, String name, String description, int price, boolean isBest, boolean isDel, Member member, Store store, ProductAttachmentFile thumbnail) {
+    public Product(Long id, String name, String description, int price, boolean isBest, boolean isDel, Store store, ProductAttachmentFile thumbnail) {
         this.id = id;
-        this.category = category;
         this.name = name;
         this.description = description;
         this.price = price;
         this.isBest = isBest;
         this.isDel = isDel;
-        this.member = member;
         this.store = store;
         this.thumbnail = thumbnail;
     }
 
-
-    public void setMember(Member member) {
-        this.member = member;
-    }
 
     public void setStore(Store store) {
         this.store = store;
