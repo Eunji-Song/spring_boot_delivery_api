@@ -1,9 +1,7 @@
 package com.example.deliveryadmin.domain.store;
 
-import com.example.deliveryadmin.common.exception.fileupload.FileUploadException;
 import com.example.deliveryadmin.common.fileupload.*;
 import com.example.deliveryadmin.common.fileupload.service.StoreAttachmentServiceImpl;
-import com.example.deliveryadmin.common.fileupload.store.StoreAttachmentFileService;
 import com.example.deliveryadmin.common.util.SecurityUtil;
 import com.example.deliveryadmin.domain.product.ProductDto;
 import com.example.deliveryadmin.domain.product.ProductService;
@@ -12,10 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.example.deliverycore.enums.StoreCategory;
 import com.example.deliverycore.enums.StoreStatus;
-import com.example.deliverycore.entity.Member;
+import com.example.deliverycore.entity.Admin;
 import com.example.deliverycore.entity.Store;
 import com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile;
-import com.example.deliverycore.embeded.FileInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,8 +39,8 @@ public class StoreService {
      */
     public Page<StoreDto.ListViewData> getAllStores(StoreCategory storeCategory, StoreStatus storeStatus, String name, Pageable pageable) {
         log.info("[StoreService:getAllStores] 매장 목록 조회");
-
-        return storeRepository.findStore(storeCategory, storeStatus, name, pageable);
+        return null;
+//        return storeRepository.findStowre(storeCategory, storeStatus, name, pageable);
     }
 
 
@@ -76,8 +73,8 @@ public class StoreService {
 
 
         // == 사용자 정보 할당 == //
-        Member member = SecurityUtil.getCurrentMemberInfo();
-        requestSaveDto.setMember(member);
+        Admin Admin = SecurityUtil.getCurrentAdminInfo();
+        requestSaveDto.setAdmin(Admin);
 
 
         // ==== 매장 정보 유효성 검사 및  등록 ==== //

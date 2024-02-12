@@ -97,7 +97,7 @@ public class StoreController {
     }
 
 
-    // == 매장 내 메뉴 조회 == //
+    // == 매장 내 메뉴 == //
 
     /**
      * 전체 메뉴 조회
@@ -109,7 +109,7 @@ public class StoreController {
     }
 
     /**
-     * 메뉴 상세 조회
+     * 메뉴 상세 조회회
      */
     @GetMapping("/{storeId}/products/{productId}")
     public ApiResult getProduct(@PathVariable Long storeId, @PathVariable Long productId) {
