@@ -10,7 +10,6 @@ import org.hibernate.annotations.Where;
 
 import java.io.Serializable;
 
-@ToString
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -58,6 +57,14 @@ public class Product extends BaseEntity implements Serializable {
         this.thumbnail = thumbnail;
     }
 
+    public Product(Long id, int price) {
+        this.id = id;
+        this.price = price;
+    }
+
+    public Product(Long id) {
+        this.id = id;
+    }
 
     public void setStore(Store store) {
         this.store = store;

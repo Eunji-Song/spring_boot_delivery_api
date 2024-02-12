@@ -17,7 +17,6 @@ import java.util.Collection;
 @Entity
 @Table(name = "member")
 @Getter
-@ToString(exclude = "stores")
 public class Member extends BaseEntity implements UserDetails  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -98,6 +97,9 @@ public class Member extends BaseEntity implements UserDetails  {
         this.withdrawalDate = withdrawalDate;
     }
 
+    public Member(Long id) {
+        this.id = id;
+    }
 
     // setter
 

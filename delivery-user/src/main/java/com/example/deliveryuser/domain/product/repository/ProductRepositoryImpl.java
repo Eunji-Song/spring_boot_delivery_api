@@ -1,10 +1,12 @@
 package com.example.deliveryuser.domain.product.repository;
 
+import com.example.deliverycore.entity.Product;
 import com.example.deliverycore.entity.QProduct;
 import com.example.deliverycore.entity.attachmentfile.QProductAttachmentFile;
 import com.example.deliveryuser.domain.product.ProductDto;
 import com.example.deliveryuser.domain.product.QProductDto_DetailInfo;
 import com.example.deliveryuser.domain.product.QProductDto_ListData;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,5 +46,16 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 .where(product.store.id.eq(storeId))
                 .fetchOne();
         return null;
+    }
+
+    @Override
+    public Product getProductPrice(Long storeId, Long productId) {
+        product = new QProduct("p");
+        Product productInfo = jpaQueryFactory
+                                    .select(Projections.constructor(Product.class, product.id, product.price))
+                                    .from(product)
+                                    .where(product.store.id.eq(storeId), product.id.eq(productId))
+                                    .fetchFirst();
+        return productInfo;
     }
 }

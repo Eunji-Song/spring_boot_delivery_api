@@ -1,13 +1,10 @@
 package com.example.deliveryuser.domain.store.repository;
 
 import com.example.deliverycore.entity.Store;
-import com.example.deliverycore.entity.attachmentfile.StoreAttachmentFile;
-import com.example.deliverycore.enums.StoreCategory;
-import com.example.deliveryuser.domain.store.StoreDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<Store, Long>, StoreRepositoryCustom {
-
+    Store getStoreById(Long storeId);
 }
