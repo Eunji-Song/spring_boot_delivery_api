@@ -6,4 +6,6 @@ public interface CartRepositoryCustom {
     boolean isExistAnotherStoreCart(Long memberId, Long storeId);
 
     Cart getCart(Long memberId);
+
+    void delete(Long cartId, Long memberId);
 }

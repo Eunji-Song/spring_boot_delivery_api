@@ -20,6 +20,7 @@ public class CartItem {
     private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private Product product;
 
     private int quantity;
@@ -32,8 +33,6 @@ public class CartItem {
         this.quantity = quantity;
         this.totalPrice = product.getPrice() * quantity;
     }
-
-
 
     public void setCart(Cart cart) {
         this.cart = cart;

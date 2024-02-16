@@ -34,15 +34,6 @@ public class CartDto {
             this.quantity = quantity;
         }
 
-        @Override
-        public String toString() {
-            return "RequestCartDto{" +
-                    "storeId=" + storeId +
-                    ", productId=" + productId +
-                    ", quantity=" + quantity +
-                    '}';
-        }
-
 
     }
 
