@@ -5,12 +5,17 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
+@ToString(exclude = "items")
 public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +24,7 @@ public class Order extends BaseEntity {
 
     // 주문자
     @Column(nullable = false)
-    private Long user_id;
+    private Long member_id;
 
     // 주문 매장
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,7 +37,21 @@ public class Order extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private OrderStatus orderStatus;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> items = new ArrayList<>();
+
+
     // 주문 금액 총액
     private int totalPrice;
 
+    public Order(Cart cart) {
+        this.member_id = cart.getMember().getId();
+        this.store = cart.getStore();
+        this.orderStatus = OrderStatus.PENDING;
+        this.totalPrice = cart.getTotalPrice();
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
 }
