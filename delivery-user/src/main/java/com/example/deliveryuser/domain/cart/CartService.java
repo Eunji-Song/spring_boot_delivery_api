@@ -1,18 +1,15 @@
 package com.example.deliveryuser.domain.cart;
 
 import com.example.deliverycore.entity.*;
-import com.example.deliveryuser.common.exception.BadRequestException;
 import com.example.deliveryuser.common.exception.ConflictException;
 import com.example.deliveryuser.common.exception.NotFoundException;
 import com.example.deliveryuser.common.exception.store.StoreNotFoundException;
-import com.example.deliveryuser.common.response.ResultCode;
 import com.example.deliveryuser.common.util.SecurityUtil;
 import com.example.deliveryuser.domain.cart.repository.CartRepository;
 import com.example.deliveryuser.domain.cartitem.repository.CartItemRepository;
 import com.example.deliveryuser.domain.product.repository.ProductRepository;
 import com.example.deliveryuser.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,6 +89,7 @@ public class CartService {
 
         // cart item 생성
         CartItem cartItem = new CartItem(productPriceInfo, requestCartDto.getQuantity());
+
 
         // 해당 매장의 장바구니 생성(Cart Entity)
         Cart cartEntity = new Cart(new Store(storeId), new Member(memberId), totalPrice);

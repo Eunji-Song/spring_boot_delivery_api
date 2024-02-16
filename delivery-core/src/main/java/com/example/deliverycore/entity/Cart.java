@@ -1,16 +1,16 @@
 package com.example.deliverycore.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@ToString
 public class Cart extends BaseEntity  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
